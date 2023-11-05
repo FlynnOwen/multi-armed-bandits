@@ -39,3 +39,10 @@ def test_ge(bandit, mock_parameter_hat):
 
 def test_gt(bandit, mock_parameter_hat):
     assert bandit > mock_parameter_hat - 0.1
+
+
+def test_generate(bandit):
+    result = bandit.generate()
+
+    assert result in {0,1}
+    assert bandit._results == [result]

@@ -7,7 +7,7 @@ class Bandit:
     """Single bandit, simulating over a Bernoulli distribution."""
 
     true_parameter: float
-    _results: list[int] = field(init=False)
+    _results: list[int] = field(default_factory=list, init=False)
 
     def generate(self):
         """
