@@ -1,3 +1,5 @@
+from random import choice
+from functools import cached_property
 from dataclasses import dataclass
 
 from src.bandit import Bandit
@@ -7,8 +9,12 @@ from src.bandit import Bandit
 class Simulation:
     bandits: list[Bandit]
 
-    def optimal_bandit(self):
-        pass
+    @cached_property
+    def optimal_bandit(self) -> Bandit:
+        return self.bandits[self.bandits.index(max(self.bandits))]
 
-    def random_bandit(self):
-        pass
+    def get_random_bandit(self) -> Bandit:
+        return choice(self.bandits)
+
+    def add_bandit(self, bandit: Bandit):
+        self.bandits.append(bandit)
