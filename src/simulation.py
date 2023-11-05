@@ -7,6 +7,10 @@ from src.bandit import Bandit
 
 @dataclass
 class Simulation:
+    """
+    Controller class for a full simulation over a collection
+    of armed bandits.
+    """
     bandits: list[Bandit]
 
     @cached_property
