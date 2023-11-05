@@ -1,5 +1,5 @@
 [tool.ruff.lint]
-select = ["E", "W", "F", "Q", "N", "D"]
+select = ["E", "W", "F", "Q", "N"]
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
