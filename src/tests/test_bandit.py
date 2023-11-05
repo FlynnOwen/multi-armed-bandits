@@ -14,14 +14,11 @@ def true_parameter():
 
 
 @pytest.fixture
-def bandit(true_parameter, mock_parameter_hat):
+def bandit(true_parameter, monkeypatch, mock_parameter_hat):
     bandit = Bandit(true_parameter)
-    
-    # TODO: MonkeyPatch parameter_hat, rather than _results.
-    bandit._results = [mock_parameter_hat]
+    monkeypatch.setattr(Bandit, "parameter_hat", mock_parameter_hat)
 
     return bandit
-
 
 
 def test_eq(bandit, mock_parameter_hat):
