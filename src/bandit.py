@@ -1,5 +1,8 @@
+import numpy as np
+
 from random import randint
 from dataclasses import dataclass, field
+from functools import cached_property
 
 
 @dataclass
@@ -19,15 +22,18 @@ class Bandit:
 
         return result
 
-    @property
+    @cached_property
     def parameter_hat(self):
         """
         The estimated parameter for this bandit.
         Note that the Maximum Likelihood estimator is used.
         """
-        return sum(self._results)/len(self._results)
+        if not self._results:
+            return np.inf
+        else:
+            return sum(self._results)/len(self._results)
 
-    @property
+    @cached_property
     def simulations(self):
         """
         Number of simulations that this armed bandit has performed.
