@@ -31,7 +31,7 @@ class Simulation:
 
     bandit_collection: BanditCollection
     exploitation_constant: float = 0.5
-    random_factor: float = 0.2
+    random_bound: float = 0.2
     _pull_count: int = 0
 
     def _upper_confidence_bound(self):
@@ -41,10 +41,18 @@ class Simulation:
         """
         pass
 
-    def bandit_strategy(self):
-        random_value = uniform(a=0, b=1)
+    def gen_random_value(self):
+        return uniform(a=0, b=1)
 
-        if random_value <= self.random_factor:
+
+    def bandit_strategy(self, random_value: float):
+        """
+        Strategy for which bandit to generate:
+        - If a randomly generate value is less than the defined
+            bound, return a random bandit.
+        - Otherwise return the current best bandit.
+        """
+        if random_value <= self.random_bound:
             return self.bandit_collection.random_bandit
         else:
             return self.bandit_collection.optimal_bandit
