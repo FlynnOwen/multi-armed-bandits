@@ -4,7 +4,7 @@ import pytest
 from random import random
 
 from src.bandit import Bandit
-from src.simulation import Simulation
+from src.simulation import BanditCollection
 
 
 @pytest.fixture
@@ -13,9 +13,9 @@ def bandits():
 
 
 @pytest.fixture
-def simulation(bandits: list[Bandit]):
-    return Simulation(bandits)
+def bandit_collection(bandits: list[Bandit]):
+    return BanditCollection(bandits)
 
 
-def test_optimal_bandit(simulation: Simulation):
-    assert simulation.optimal_bandit.parameter_hat == np.inf
+def test_optimal_bandit(bandit_collection: BanditCollection):
+    assert bandit_collection.optimal_bandit.parameter_hat == np.inf
