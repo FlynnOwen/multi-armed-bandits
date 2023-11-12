@@ -32,7 +32,17 @@ class Simulation:
     bandit_collection: BanditCollection
     exploitation_constant: float = 0.5
     random_bound: float = 0.2
-    _pull_count: int = 0
+
+    def __iter__(self):
+        self._pull_count = 0
+        return self
+
+    def __next__(self):
+        self._pull_count += 1
+        random_value = self.gen_random_value()
+        bandit = self.bandit_strategy(random_value=random_value)
+        return bandit.generate()
+
 
     def _upper_confidence_bound(self):
         """
@@ -45,7 +55,7 @@ class Simulation:
         return uniform(a=0, b=1)
 
 
-    def bandit_strategy(self, random_value: float):
+    def _bandit_strategy(self, random_value: float):
         """
         Strategy for which bandit to generate:
         - If a randomly generate value is less than the defined
@@ -57,9 +67,9 @@ class Simulation:
         else:
             return self.bandit_collection.optimal_bandit
 
-    def simulate(self, number_pulls: int):
-        """
-        Performs a simulation for number_pulls.
-        """
-        self._pull_count += 1
-        pass
+
+def simulate(simulation: Simulation, pull_count: int):
+    """
+    Run a simulation for pull_count iterations.
+    """
+    pass
