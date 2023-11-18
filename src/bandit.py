@@ -2,9 +2,10 @@ import numpy as np
 
 from random import randint
 from dataclasses import dataclass, field
-from functools import cached_property
+from functools import cached_property, total_ordering
 
 
+@total_ordering
 @dataclass
 class Bandit:
     """Single bandit, simulating over a Bernoulli distribution."""
@@ -31,7 +32,7 @@ class Bandit:
         if not self._results:
             return np.inf
         else:
-            return sum(self._results)/len(self._results)
+            return sum(self._results) / len(self._results)
 
     @cached_property
     def simulations(self):
@@ -48,12 +49,3 @@ class Bandit:
 
     def __lt__(self, value: float):
         return self.parameter_hat < value
-
-    def __le__(self, value: float):
-        return self.parameter_hat <= value
-
-    def __gt__(self, value: float):
-        return self.parameter_hat > value
-
-    def __ge__(self, value: float):
-        return self.parameter_hat >= value
