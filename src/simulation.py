@@ -13,8 +13,14 @@ class Simulation(ABC):
     """
 
     bandit_collection: BanditCollection
-    simulations: int = 0
+    simulations: int
+    _simulation: int = 0
 
+    @property
+    def simulation(self):
+        return self._simulation
+
+    @abstractmethod
     def _bandit_strategy(self):
         """
         Strategy for which bandit to generate

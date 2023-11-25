@@ -61,6 +61,7 @@ class BanditCollection:
     def optimal_bandit(self) -> Bandit:
         return self.bandits[self.bandits.index(max(self.bandits))]
 
+    @property
     def random_bandit(self) -> Bandit:
         return choice(self.bandits)
 

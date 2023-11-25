@@ -15,6 +15,7 @@ def mock_parameter_hat():
 def true_parameter():
     return 0.5
 
+
 @pytest.fixture
 def bandits():
     return [Bandit(random()) for _ in range(10)]
