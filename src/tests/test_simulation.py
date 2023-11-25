@@ -1,6 +1,6 @@
-import numpy as np
 import pytest
 
+from math import inf
 from random import random
 
 from src.bandit import Bandit
@@ -18,4 +18,4 @@ def bandit_collection(bandits: list[Bandit]):
 
 
 def test_optimal_bandit(bandit_collection: BanditCollection):
-    assert bandit_collection.optimal_bandit.parameter_hat == np.inf
+    assert bandit_collection.optimal_bandit.parameter_hat == inf

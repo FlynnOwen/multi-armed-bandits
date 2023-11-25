@@ -1,6 +1,6 @@
 from random import choice, uniform
 from functools import cached_property
-from dataclasses import dataclass, Field
+from dataclasses import dataclass
 from math import sqrt, log
 
 from src.bandit import Bandit
@@ -33,8 +33,7 @@ class Simulation:
     bandit_collection: BanditCollection
     exploitation_constant: float = 0.5
     random_bound: float = 0.2
-    simulations: int = Field(default=0, init=False)
-
+    simulations: int = 0
 
     def _ucb(self):
         """

@@ -1,5 +1,4 @@
-import numpy as np
-
+from math import inf
 from random import randint
 from dataclasses import dataclass, field
 from functools import cached_property, total_ordering
@@ -30,7 +29,7 @@ class Bandit:
         Note that the Maximum Likelihood estimator is used.
         """
         if not self._results:
-            return np.inf
+            return inf
         else:
             return sum(self._results) / len(self._results)
 
