@@ -13,12 +13,12 @@ class Simulation(ABC):
     """
 
     bandit_collection: BanditCollection
-    simulations: int
-    _simulation: int = 0
+    num_simulations: int
+    _simulation_num: int = 0
 
     @property
-    def simulation(self):
-        return self._simulation
+    def simulation_num(self):
+        return self._simulation_num
 
     @abstractmethod
     def _bandit_strategy(self):
@@ -28,8 +28,11 @@ class Simulation(ABC):
         pass
 
     @abstractmethod
-    def simulate(self):
+    def simulate_one(self):
         pass
+
+    def simulation(self) -> None:
+        [self.simulate_one() for _ in range(self.num_simulations)]
 
 
 @dataclass
@@ -55,8 +58,8 @@ class EpsilonSimulation(Simulation):
         else:
             return self.bandit_collection.optimal_bandit
 
-    def simulate(self):
-        self.simulations += 1
+    def simulate_one(self):
+        self._simulation_num += 1
         random_value = self.gen_random_value()
         bandit = self.bandit_strategy(random_value=random_value)
         return bandit.generate()
@@ -78,11 +81,11 @@ class UCBSimulation(Simulation):
         """
         best_bandit = self.bandit_collection.optimal_bandit
         return ucb(q=best_bandit.parameter_hat,
-                    t=self.simulations,
+                    t=self.num_simulations,
                     c=self.exploitation_constant,
-                    q_t=best_bandit.simulations)
+                    q_t=best_bandit.num_simulations)
 
-    def simulate(self):
+    def simulate_one(self):
         pass
 
 

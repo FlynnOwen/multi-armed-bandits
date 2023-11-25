@@ -34,7 +34,7 @@ class Bandit:
             return sum(self._results) / len(self._results)
 
     @cached_property
-    def simulations(self):
+    def num_simulations(self):
         """
         Number of simulations that this armed bandit has performed.
         """
