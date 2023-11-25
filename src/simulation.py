@@ -42,11 +42,11 @@ class EpsilonSimulation(Simulation):
     """
     Simulations that involve 'Epsilon' strategies.
     """
+
     random_bound: float = 0.2
 
     def gen_random_value(self) -> float:
         return uniform(a=0, b=1)
-
 
     def _bandit_strategy(self, random_value: float) -> Bandit:
         """
@@ -74,6 +74,7 @@ class UCBSimulation(Simulation):
 
     NOTE: This is incomplete
     """
+
     exploitation_constant: float = 0.5
 
     def _ucb(self) -> float:
@@ -82,10 +83,12 @@ class UCBSimulation(Simulation):
         bandit collection.
         """
         best_bandit = self.bandit_collection.optimal_bandit
-        return ucb(q=best_bandit.parameter_hat,
-                   t=self.num_simulations,
-                   c=self.exploitation_constant,
-                   q_t=best_bandit.num_simulations)
+        return ucb(
+            q=best_bandit.parameter_hat,
+            t=self.num_simulations,
+            c=self.exploitation_constant,
+            q_t=best_bandit.num_simulations,
+        )
 
     def simulate_one(self):
         pass
@@ -106,6 +109,7 @@ class Metrics:
 
     NOTE: This is incomplete
     """
+
     bandit_collection: BanditCollection
 
     @property
@@ -117,5 +121,4 @@ class Metrics:
         pass
 
     def __str__(self) -> str:
-        return tabulate(data=[self.mape, self.mae],
-                        headers=["mape", "mae"])
+        return tabulate(data=[self.mape, self.mae], headers=["mape", "mae"])

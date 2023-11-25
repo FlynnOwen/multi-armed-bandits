@@ -19,9 +19,9 @@ def bandit_collection(bandits: list[Bandit]):
 
 @pytest.fixture(scope="module")
 def epsilon_simulation(bandit_collection: BanditCollection) -> EpsilonSimulation:
-    return EpsilonSimulation(bandit_collection=bandit_collection,
-                             num_simulations=50,
-                             random_bound=0.2)
+    return EpsilonSimulation(
+        bandit_collection=bandit_collection, num_simulations=50, random_bound=0.2
+    )
 
 
 def test_gen_random_value(epsilon_simulation: EpsilonSimulation):
@@ -48,14 +48,17 @@ def test_simulate_one(epsilon_simulation: EpsilonSimulation):
     epsilon_simulation.simulate_one()
 
     assert epsilon_simulation.simulation_num == 1
-    assert min(epsilon_simulation.bandit_collection).parameter_hat in {0,1}
+    assert min(epsilon_simulation.bandit_collection).parameter_hat in {0, 1}
     assert min(epsilon_simulation.bandit_collection).num_simulations == 1
 
 
 def test_simulation(epsilon_simulation: EpsilonSimulation):
     epsilon_simulation.simulation()
     expected_simulations = epsilon_simulation.num_simulations
-    bandit_sims = [bandit.num_simulations for bandit in epsilon_simulation.bandit_collection.bandits]
+    bandit_sims = [
+        bandit.num_simulations
+        for bandit in epsilon_simulation.bandit_collection.bandits
+    ]
 
     assert epsilon_simulation.simulation_num == expected_simulations
     assert sum(bandit_sims) == expected_simulations

@@ -53,6 +53,7 @@ class BanditCollection:
     """
     Container class for a collection of armed bandits.
     """
+
     bandits: list[Bandit]
 
     def __iter__(self):

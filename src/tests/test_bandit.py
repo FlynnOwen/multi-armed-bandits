@@ -30,7 +30,6 @@ def test_optimal_bandit(bandit_collection: BanditCollection):
     assert bandit_collection.optimal_bandit.parameter_hat == inf
 
 
-
 @pytest.fixture
 def bandit(true_parameter, monkeypatch, mock_parameter_hat):
     bandit = Bandit(true_parameter)
@@ -62,4 +61,4 @@ def test_gt(bandit, mock_parameter_hat):
 def test_generate(bandit):
     bandit.generate()
 
-    assert bandit._results[0] in {0,1}
+    assert bandit._results[0] in {0, 1}
