@@ -1,6 +1,7 @@
 from random import choice, uniform
 from functools import cached_property
-from dataclasses import dataclass
+from dataclasses import dataclass, Field
+from math import sqrt, log
 
 from src.bandit import Bandit
 
@@ -32,24 +33,19 @@ class Simulation:
     bandit_collection: BanditCollection
     exploitation_constant: float = 0.5
     random_bound: float = 0.2
-
-    def __iter__(self):
-        self._pull_count = 0
-        return self
-
-    def __next__(self):
-        self._pull_count += 1
-        random_value = self.gen_random_value()
-        bandit = self.bandit_strategy(random_value=random_value)
-        return bandit.generate()
+    simulations: int = Field(default=0, init=False)
 
 
-    def _upper_confidence_bound(self):
+    def _ucb(self):
         """
         Calculates the upper confidence bound given the current
         bandit collection.
         """
-        pass
+        best_bandit = self.bandit_collection.optimal_bandit()
+        return ucb(q=best_bandit.parameter_hat,
+                   t=self.simulations,
+                   c=self.exploitation_constant,
+                   q_t=best_bandit.simulations)
 
     def gen_random_value(self):
         return uniform(a=0, b=1)
@@ -67,9 +63,32 @@ class Simulation:
         else:
             return self.bandit_collection.optimal_bandit
 
+    def simulate(self):
+        self.simulations += 1
+        random_value = self.gen_random_value()
+        bandit = self.bandit_strategy(random_value=random_value)
+        return bandit.generate()
 
 def simulate(simulation: Simulation, pull_count: int):
     """
     Run a simulation for pull_count iterations.
     """
-    pass
+    for _ in range(pull_count):
+        simulation.simulate()
+
+def ucb(q: float,
+        t: int,
+        c: float,
+        q_t: int):
+    """
+    Calculates the upper confidence bound.
+
+    Where UCB = Argmax(a) Q_t(a) + c(sqrt((ln(t)/N_t(a))))
+
+    Note that:
+    q: Average reward for the best bandit.
+    t: Number of total bandit pulls.
+    c: A constant that balances exploration vs exploitation.
+    q_t: The number of times the best bandit has been pulled.
+    """
+    return q + (c * sqrt(log(t)/q_t))
