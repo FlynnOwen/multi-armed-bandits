@@ -32,7 +32,7 @@ class Simulation(ABC):
         pass
 
     def simulation(self) -> None:
-        [self.simulate_one() for _ in range(self.num_simulations)]
+        [self.simulate_one() for _ in range(self.simulation_num, self.num_simulations)]
 
 
 @dataclass
@@ -81,9 +81,9 @@ class UCBSimulation(Simulation):
         """
         best_bandit = self.bandit_collection.optimal_bandit
         return ucb(q=best_bandit.parameter_hat,
-                    t=self.num_simulations,
-                    c=self.exploitation_constant,
-                    q_t=best_bandit.num_simulations)
+                   t=self.num_simulations,
+                   c=self.exploitation_constant,
+                   q_t=best_bandit.num_simulations)
 
     def simulate_one(self):
         pass
