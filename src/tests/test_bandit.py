@@ -1,6 +1,9 @@
 import pytest
 
-from src.bandit import Bandit
+from math import inf
+from random import random
+
+from src.bandit import Bandit, BanditCollection
 
 
 @pytest.fixture
@@ -11,6 +14,20 @@ def mock_parameter_hat():
 @pytest.fixture
 def true_parameter():
     return 0.5
+
+@pytest.fixture
+def bandits():
+    return [Bandit(random()) for _ in range(10)]
+
+
+@pytest.fixture
+def bandit_collection(bandits: list[Bandit]):
+    return BanditCollection(bandits)
+
+
+def test_optimal_bandit(bandit_collection: BanditCollection):
+    assert bandit_collection.optimal_bandit.parameter_hat == inf
+
 
 
 @pytest.fixture

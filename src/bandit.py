@@ -1,5 +1,5 @@
 from math import inf
-from random import randint
+from random import randint, choice
 from dataclasses import dataclass, field
 from functools import cached_property, total_ordering
 
@@ -48,3 +48,21 @@ class Bandit:
 
     def __lt__(self, value: float):
         return self.parameter_hat < value
+
+
+@dataclass
+class BanditCollection:
+    """
+    Container class for a collection of armed bandits.
+    """
+    bandits: list[Bandit]
+
+    @cached_property
+    def optimal_bandit(self) -> Bandit:
+        return self.bandits[self.bandits.index(max(self.bandits))]
+
+    def random_bandit(self) -> Bandit:
+        return choice(self.bandits)
+
+    def add_bandit(self, bandit: Bandit):
+        self.bandits.append(bandit)

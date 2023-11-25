@@ -1,27 +1,9 @@
-from random import choice, uniform
-from functools import cached_property
+from random import uniform
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
-from src.bandit import Bandit
-
-
-@dataclass
-class BanditCollection:
-    """
-    Container class for a collection of armed bandits.
-    """
-    bandits: list[Bandit]
-
-    @cached_property
-    def optimal_bandit(self) -> Bandit:
-        return self.bandits[self.bandits.index(max(self.bandits))]
-
-    def random_bandit(self) -> Bandit:
-        return choice(self.bandits)
-
-    def add_bandit(self, bandit: Bandit):
-        self.bandits.append(bandit)
+from src.bandit import Bandit, BanditCollection
+from src.utils.utils import ucb
 
 
 @dataclass
@@ -55,7 +37,7 @@ class EpsilonSimulation(Simulation):
         return uniform(a=0, b=1)
 
 
-    def _bandit_strategy(self, random_value: float):
+    def _bandit_strategy(self, random_value: float) -> Bandit:
         """
         Strategy for which bandit to generate:
         - If a randomly generate value is less than the defined
@@ -83,7 +65,7 @@ class UCBSimulation(Simulation):
     """
     exploitation_constant: float = 0.5
 
-    def _ucb(self):
+    def _ucb(self) -> float:
         """
         Calculates the upper confidence bound given the current
         bandit collection.
