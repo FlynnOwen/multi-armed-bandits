@@ -2,6 +2,8 @@ from random import uniform
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
+from tabulate import tabulate
+
 from src.bandit import Bandit, BanditCollection
 from src.utils.utils import ucb
 
@@ -95,3 +97,25 @@ def simulate(simulation: Simulation, pull_count: int):
     """
     for _ in range(pull_count):
         simulation.simulate()
+
+
+@dataclass
+class Metrics:
+    """
+    Simulation incorporating the Upper Confidence Bound (UCB).
+
+    NOTE: This is incomplete
+    """
+    bandit_collection: BanditCollection
+
+    @property
+    def mae(self) -> float:
+        pass
+
+    @property
+    def mape(self) -> float:
+        pass
+
+    def __str__(self) -> str:
+        return tabulate(data=[self.mape, self.mae],
+                        headers=["mape", "mae"])
