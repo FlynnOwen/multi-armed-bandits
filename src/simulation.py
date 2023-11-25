@@ -42,7 +42,7 @@ class EpsilonSimulation(Simulation):
     """
     random_bound: float = 0.2
 
-    def gen_random_value(self):
+    def gen_random_value(self) -> float:
         return uniform(a=0, b=1)
 
 
@@ -58,11 +58,11 @@ class EpsilonSimulation(Simulation):
         else:
             return self.bandit_collection.optimal_bandit
 
-    def simulate_one(self):
+    def simulate_one(self) -> None:
         self._simulation_num += 1
         random_value = self.gen_random_value()
-        bandit = self.bandit_strategy(random_value=random_value)
-        return bandit.generate()
+        bandit = self._bandit_strategy(random_value=random_value)
+        bandit.generate()
 
 
 @dataclass

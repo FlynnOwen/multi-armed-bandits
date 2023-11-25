@@ -60,7 +60,6 @@ def test_gt(bandit, mock_parameter_hat):
 
 
 def test_generate(bandit):
-    result = bandit.generate()
+    bandit.generate()
 
-    assert result in {0,1}
-    assert bandit._results == [result]
+    assert bandit._results[0] in {0,1}

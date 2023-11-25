@@ -42,3 +42,11 @@ def test_bandit_strategy_high(epsilon_simulation: EpsilonSimulation):
 
     bandit = epsilon_simulation._bandit_strategy(random_value)
     assert bandit.parameter_hat == inf
+
+
+def test_simulate_one(epsilon_simulation: EpsilonSimulation, bandit_collection):
+    epsilon_simulation.simulate_one()
+
+    assert epsilon_simulation.simulation_num == 1
+    assert min(epsilon_simulation.bandit_collection).parameter_hat in {0,1}
+    assert min(epsilon_simulation.bandit_collection).num_simulations == 1

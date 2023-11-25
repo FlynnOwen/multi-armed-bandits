@@ -1,7 +1,7 @@
 from math import inf
 from random import randint, choice
 from dataclasses import dataclass, field
-from functools import cached_property, total_ordering
+from functools import total_ordering
 
 
 @total_ordering
@@ -20,9 +20,7 @@ class Bandit:
         result = randint(0, 1)
         self._results.append(result)
 
-        return result
-
-    @cached_property
+    @property
     def parameter_hat(self):
         """
         The estimated parameter for this bandit.
@@ -33,7 +31,7 @@ class Bandit:
         else:
             return sum(self._results) / len(self._results)
 
-    @cached_property
+    @property
     def num_simulations(self):
         """
         Number of simulations that this armed bandit has performed.
@@ -57,7 +55,10 @@ class BanditCollection:
     """
     bandits: list[Bandit]
 
-    @cached_property
+    def __iter__(self):
+        return iter(self.bandits)
+
+    @property
     def optimal_bandit(self) -> Bandit:
         return self.bandits[self.bandits.index(max(self.bandits))]
 
