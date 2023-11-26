@@ -35,11 +35,20 @@ class Bandit(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def residual(self):
         """
         Residual between the true parameter(s)
         and the estimated parameter(s).
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def reward(self):
+        """
+        The total utility gained from this bandit.
         """
         pass
 
@@ -88,6 +97,10 @@ class BernoulliBandit(Bandit):
         bandit and the estimated parameter.
         """
         return self.true_parameter - self.parameter_hat
+
+    @property
+    def reward(self):
+        return sum(self._results)
 
     @property
     def num_simulations(self):
