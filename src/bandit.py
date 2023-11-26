@@ -13,6 +13,7 @@ class Bandit(ABC):
 
     Note that bandits may follow different distributions (e.g) Bernoulli.
     """
+
     true_parameter: Any
     _results: list[Any] = field(default_factory=list, init=False)
 
@@ -62,6 +63,7 @@ class Bandit(ABC):
     @abstractmethod
     def __lt__(self, value: float):
         pass
+
 
 @total_ordering
 @dataclass

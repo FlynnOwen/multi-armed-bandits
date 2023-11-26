@@ -63,5 +63,6 @@ def test_generate(bandit):
 
     assert bandit._results[0] in {0, 1}
 
+
 def test_reward(bandit):
-    assert bandit.reward in {0,1}
+    assert bandit.reward in {0, 1}

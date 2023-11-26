@@ -113,12 +113,20 @@ class Metrics:
     bandit_collection: BanditCollection
 
     @property
-    def ae(self) -> float:
+    def total_sims(self) -> int:
+        return sum([len(bandit) for bandit in self.bandit_collection])
+
+    @property
+    def _ae(self) -> float:
         return sum([bandit.residual for bandit in self.bandit_collection])
 
     @property
     def mae(self) -> float:
-        return self.ae / len(self.bandit_collection)
+        return self._ae / len(self.bandit_collection)
+
+    @property
+    def total_reward(self) -> float:
+        return sum([bandit.reward for bandit in self.bandit_collection])
 
     @property
     def mape(self) -> float:
@@ -130,4 +138,7 @@ class Metrics:
         ) / len(self.bandit_collection)
 
     def __str__(self) -> str:
-        return tabulate(data=[self.mape, self.mae], headers=["mape", "mae"])
+        return tabulate(
+            data=[self.total_sims, self.total_reward, self.mape, self.mae],
+            headers=["total simulations", "total reward", "mape", "mae"],
+        )
