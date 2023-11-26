@@ -32,6 +32,10 @@ class Bandit:
             return sum(self._results) / len(self._results)
 
     @property
+    def residual(self):
+        return self.true_parameter - self.parameter_hat
+
+    @property
     def num_simulations(self):
         """
         Number of simulations that this armed bandit has performed.
@@ -58,6 +62,9 @@ class BanditCollection:
 
     def __iter__(self):
         return iter(self.bandits)
+
+    def __len__(self):
+        return len(self.bandits)
 
     @property
     def optimal_bandit(self) -> Bandit:

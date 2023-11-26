@@ -113,12 +113,21 @@ class Metrics:
     bandit_collection: BanditCollection
 
     @property
+    def ae(self) -> float:
+        return sum([bandit.residual for bandit in self.bandit_collection])
+
+    @property
     def mae(self) -> float:
-        pass
+        return self.ae / len(self.bandit_collection)
 
     @property
     def mape(self) -> float:
-        pass
+        return sum(
+            [
+                bandit.residual / bandit.true_parameter
+                for bandit in self.bandit_collection
+            ]
+        ) / len(self.bandit_collection)
 
     def __str__(self) -> str:
         return tabulate(data=[self.mape, self.mae], headers=["mape", "mae"])
