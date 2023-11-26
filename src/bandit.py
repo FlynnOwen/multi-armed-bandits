@@ -1,12 +1,62 @@
 from math import inf
 from random import randint, choice
 from dataclasses import dataclass, field
+from abc import ABC, abstractmethod
+from typing import Any
 from functools import total_ordering
 
 
+@dataclass
+class Bandit(ABC):
+    """
+    Base class for a Bandit.
+
+    Note that bandits may follow different distributions (e.g) Bernoulli.
+    """
+    true_parameter: Any
+    _results: list[Any] = field(default_factory=list, init=False)
+
+    @abstractmethod
+    def generate(self):
+        """
+        'Pull' the armed bandit.
+        The result is a value sampled from the distribution
+        that the armed bandit follows.
+
+        The result is then cached.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def parameter_hat(self):
+        """
+        The estimated parameter(s).
+        """
+        pass
+
+    @abstractmethod
+    def residual(self):
+        """
+        Residual between the true parameter(s)
+        and the estimated parameter(s).
+        """
+        pass
+
+    def __len__(self):
+        return len(self._results)
+
+    @abstractmethod
+    def __eq__(self, value: float):
+        pass
+
+    @abstractmethod
+    def __lt__(self, value: float):
+        pass
+
 @total_ordering
 @dataclass
-class Bandit:
+class BernoulliBandit(Bandit):
     """Single bandit, simulating over a Bernoulli distribution."""
 
     true_parameter: float
@@ -33,6 +83,10 @@ class Bandit:
 
     @property
     def residual(self):
+        """
+        The difference between the true parameter of an armed
+        bandit and the estimated parameter.
+        """
         return self.true_parameter - self.parameter_hat
 
     @property
@@ -40,9 +94,6 @@ class Bandit:
         """
         Number of simulations that this armed bandit has performed.
         """
-        return len(self._results)
-
-    def __len__(self):
         return len(self._results)
 
     def __eq__(self, value: float):

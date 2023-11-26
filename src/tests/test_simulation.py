@@ -2,18 +2,18 @@ import pytest
 
 from math import inf
 
-from src.bandit import Bandit, BanditCollection
+from src.bandit import BernoulliBandit, BanditCollection
 from src.simulation import EpsilonSimulation
 from random import random
 
 
 @pytest.fixture(scope="module")
 def bandits():
-    return [Bandit(random()) for _ in range(10)]
+    return [BernoulliBandit(random()) for _ in range(10)]
 
 
 @pytest.fixture(scope="module")
-def bandit_collection(bandits: list[Bandit]):
+def bandit_collection(bandits: list[BernoulliBandit]):
     return BanditCollection(bandits)
 
 
@@ -34,7 +34,7 @@ def test_bandit_strategy_low(epsilon_simulation: EpsilonSimulation):
     random_value = 0.1
 
     bandit = epsilon_simulation._bandit_strategy(random_value)
-    assert isinstance(bandit, Bandit)
+    assert isinstance(bandit, BernoulliBandit)
 
 
 def test_bandit_strategy_high(epsilon_simulation: EpsilonSimulation):
