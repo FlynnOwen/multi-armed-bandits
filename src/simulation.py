@@ -67,6 +67,56 @@ class EpsilonSimulation(Simulation):
         bandit.generate()
 
 
+class SemiUniformStrategy(ABC):
+    """
+    Implements the strategy pattern for 'Semi-Uniform' strategies
+    in the Multi-Armed Bandit problem.
+
+    Semi-uniform strategies were the earliest (and simplest)
+    strategies discovered to approximately solve the bandit problem.
+    """
+
+    epsilon: float = 0.2
+    num_simulations: int
+
+    @abstractmethod
+    def full_simulation(self):
+        pass
+
+
+class EpsilonGreegyStrategy(SemiUniformStrategy):
+    """
+    The best lever is selected for 1-epsilon of the trials,
+    and a lever is selected at (Uniform) random for a proportion
+    epsilon.
+    """
+
+    def full_simulation(self):
+        pass
+
+
+class EpsilonFirstStrategy(SemiUniformStrategy):
+    """
+    A pure exploration phase is followed by a pure exploitation phase.
+    """
+
+    def full_simulation(self):
+        pass
+
+
+class EpsilonDecreasingStrategy(SemiUniformStrategy):
+    """
+    Similar to EpsilonGreegyStrategy, but epsilon gradually decreases.
+    This results in highly explorative behaviour, followed by highly
+    exploitative behaviour.
+    """
+
+    decay_rate: float
+
+    def full_simulation(self):
+        pass
+
+
 @dataclass
 class UCBSimulation(Simulation):
     """
