@@ -24,17 +24,6 @@ class Simulation(ABC):
     def simulation_num(self):
         return self._simulation_num
 
-    @abstractmethod
-    def _bandit_strategy(self):
-        """
-        Strategy for which bandit to generate
-        """
-        pass
-
-    @abstractmethod
-    def simulate_one(self):
-        pass
-
     def full_simulation(self) -> None:
         self.strategy.full_simulation(self.num_simulations,
                                       self.bandit_collection)
@@ -45,29 +34,7 @@ class EpsilonSimulation(Simulation):
     """
     Simulations that involve 'Epsilon' strategies.
     """
-
-    random_bound: float = 0.2
-
-    def gen_random_value(self) -> float:
-        return uniform(a=0, b=1)
-
-    def _bandit_strategy(self, random_value: float) -> Bandit:
-        """
-        Strategy for which bandit to generate:
-        - If a randomly generate value is less than the defined
-            bound, return a random bandit.
-        - Otherwise return the current best bandit.
-        """
-        if random_value <= self.random_bound:
-            return self.bandit_collection.random_bandit
-        else:
-            return self.bandit_collection.optimal_bandit
-
-    def simulate_one(self) -> None:
-        self._simulation_num += 1
-        random_value = self.gen_random_value()
-        bandit = self._bandit_strategy(random_value=random_value)
-        bandit.generate()
+    pass
 
 
 class SemiUniformStrategy(ABC):
@@ -80,6 +47,30 @@ class SemiUniformStrategy(ABC):
     """
 
     epsilon: float = 0.2
+    random_bound: float = 0.2
+
+    def gen_random_value(self) -> float:
+        return uniform(a=0, b=1)
+
+    def _bandit_strategy(self,
+                         random_value: float,
+                         bandit_collection: BanditCollection) -> Bandit:
+        """
+        Strategy for which bandit to generate:
+        - If a randomly generate value is less than the defined
+            bound, return a random bandit.
+        - Otherwise return the current best bandit.
+        """
+        if random_value <= self.random_bound:
+            return self.bandit_collection.random_bandit
+        else:
+            return self.bandit_collection.optimal_bandit
+
+    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+        random_value = self.gen_random_value()
+        bandit = self._bandit_strategy(random_value=random_value, 
+                                       bandit_collection=bandit_collection)
+        bandit.generate()
 
     @abstractmethod
     def full_simulation(self,
@@ -149,17 +140,6 @@ class UCBSimulation(Simulation):
             c=self.exploitation_constant,
             q_t=best_bandit.num_simulations,
         )
-
-    def simulate_one(self):
-        pass
-
-
-def simulate(simulation: Simulation, pull_count: int):
-    """
-    Run a simulation for pull_count iterations.
-    """
-    for _ in range(pull_count):
-        simulation.simulate()
 
 
 @dataclass
