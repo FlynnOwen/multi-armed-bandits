@@ -33,13 +33,15 @@
      "UP", # pyupgrade
      "W", # Warning
  ]
+
+ignore = [
+    "COM812", 
+    "ISC001"
+ ] # conflicts
  
  # Allow fix for all enabled rules (when --fix) is provided. (only safes fixes will be applied)
  fixable = ["ALL"]
  unfixable = []
- 
- [tool.ruff.mccabe]
- max-complexity = 5 # This is currently not in use as a function is raising issues.
  
  [tool.ruff.flake8-quotes]
  inline-quotes = "double"

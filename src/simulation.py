@@ -26,8 +26,7 @@ class Simulation(ABC):
         return self._simulation_num
 
     def full_simulation(self) -> None:
-        self.strategy.full_simulation(self.num_simulations,
-                                      self.bandit_collection)
+        self.strategy.full_simulation(self.num_simulations, self.bandit_collection)
 
 
 @dataclass
@@ -52,9 +51,9 @@ class SemiUniformStrategy(ABC):
     def gen_random_value(self) -> float:
         return uniform(a=0, b=1)
 
-    def _bandit_strategy(self,
-                         random_value: float,
-                         bandit_collection: BanditCollection) -> Bandit:
+    def _bandit_strategy(
+        self, random_value: float, bandit_collection: BanditCollection
+    ) -> Bandit:
         """
         Strategy for which bandit to generate:
         - If a randomly generate value is less than the defined
@@ -68,14 +67,15 @@ class SemiUniformStrategy(ABC):
 
     def simulate_one(self, bandit_collection: BanditCollection) -> None:
         random_value = self.gen_random_value()
-        bandit = self._bandit_strategy(random_value=random_value,
-                                       bandit_collection=bandit_collection)
+        bandit = self._bandit_strategy(
+            random_value=random_value, bandit_collection=bandit_collection
+        )
         bandit.generate()
 
     @abstractmethod
-    def full_simulation(self,
-                        num_simulations: int,
-                        bandit_collection: BanditCollection):
+    def full_simulation(
+        self, num_simulations: int, bandit_collection: BanditCollection
+    ):
         pass
 
 
@@ -86,9 +86,9 @@ class EpsilonGreegyStrategy(SemiUniformStrategy):
     epsilon.
     """
 
-    def full_simulation(self,
-                        num_simulations: int,
-                        bandit_collection: BanditCollection):
+    def full_simulation(
+        self, num_simulations: int, bandit_collection: BanditCollection
+    ):
         pass
 
 
@@ -97,9 +97,9 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
     A pure exploration phase is followed by a pure exploitation phase.
     """
 
-    def full_simulation(self,
-                        num_simulations: int,
-                        bandit_collection: BanditCollection):
+    def full_simulation(
+        self, num_simulations: int, bandit_collection: BanditCollection
+    ):
         pass
 
 
@@ -112,9 +112,9 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
 
     decay_rate: float
 
-    def full_simulation(self,
-                        num_simulations: int,
-                        bandit_collection: BanditCollection):
+    def full_simulation(
+        self, num_simulations: int, bandit_collection: BanditCollection
+    ):
         pass
 
 

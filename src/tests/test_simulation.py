@@ -20,7 +20,9 @@ def bandit_collection(bandits: list[BernoulliBandit]):
 @pytest.fixture(scope="module")
 def epsilon_simulation(bandit_collection: BanditCollection) -> EpsilonSimulation:
     return EpsilonSimulation(
-        bandit_collection=bandit_collection, num_simulations=50, random_bound=0.2,
+        bandit_collection=bandit_collection,
+        num_simulations=50,
+        random_bound=0.2,
     )
 
 
