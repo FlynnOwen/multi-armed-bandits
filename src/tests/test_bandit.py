@@ -1,27 +1,27 @@
-import pytest
-
 from math import inf
 from random import random
 
-from src.bandit import BernoulliBandit, BanditCollection
+import pytest
+
+from src.bandit import BanditCollection, BernoulliBandit
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_parameter_hat():
     return 0.5
 
 
-@pytest.fixture
+@pytest.fixture()
 def true_parameter():
     return 0.5
 
 
-@pytest.fixture
+@pytest.fixture()
 def bandits():
     return [BernoulliBandit(random()) for _ in range(10)]
 
 
-@pytest.fixture
+@pytest.fixture()
 def bandit_collection(bandits: list[BernoulliBandit]):
     return BanditCollection(bandits)
 
@@ -30,7 +30,7 @@ def test_optimal_bandit(bandit_collection: BanditCollection):
     assert bandit_collection.optimal_bandit.parameter_hat == inf
 
 
-@pytest.fixture
+@pytest.fixture()
 def bandit(true_parameter, monkeypatch, mock_parameter_hat):
     bandit = BernoulliBandit(true_parameter)
     monkeypatch.setattr(BernoulliBandit, "parameter_hat", mock_parameter_hat)

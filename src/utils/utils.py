@@ -1,4 +1,4 @@
-from math import sqrt, log
+from math import log, sqrt
 
 
 def ucb(q: float, t: int, c: float, q_t: int):

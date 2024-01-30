@@ -1,9 +1,9 @@
-from math import inf
-from random import randint, choice
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
-from typing import Any
+from dataclasses import dataclass, field
 from functools import total_ordering
+from math import inf
+from random import choice, randint
+from typing import Any
 
 
 @dataclass
@@ -26,7 +26,6 @@ class Bandit(ABC):
 
         The result is then cached.
         """
-        pass
 
     @property
     @abstractmethod
@@ -34,7 +33,6 @@ class Bandit(ABC):
         """
         The estimated parameter(s).
         """
-        pass
 
     @property
     @abstractmethod
@@ -43,7 +41,6 @@ class Bandit(ABC):
         Residual between the true parameter(s)
         and the estimated parameter(s).
         """
-        pass
 
     @property
     @abstractmethod
@@ -51,7 +48,6 @@ class Bandit(ABC):
         """
         The total utility gained from this bandit.
         """
-        pass
 
     def __len__(self):
         return len(self._results)

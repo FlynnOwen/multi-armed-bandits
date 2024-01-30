@@ -1,7 +1,8 @@
 from __future__ import annotations
-from random import uniform
-from dataclasses import dataclass
+
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from random import uniform
 
 from tabulate import tabulate
 
@@ -34,7 +35,6 @@ class EpsilonSimulation(Simulation):
     """
     Simulations that involve 'Epsilon' strategies.
     """
-    pass
 
 
 class SemiUniformStrategy(ABC):
@@ -68,7 +68,7 @@ class SemiUniformStrategy(ABC):
 
     def simulate_one(self, bandit_collection: BanditCollection) -> None:
         random_value = self.gen_random_value()
-        bandit = self._bandit_strategy(random_value=random_value, 
+        bandit = self._bandit_strategy(random_value=random_value,
                                        bandit_collection=bandit_collection)
         bandit.generate()
 
@@ -174,7 +174,7 @@ class Metrics:
             [
                 bandit.residual / bandit.true_parameter
                 for bandit in self.bandit_collection
-            ]
+            ],
         ) / len(self.bandit_collection)
 
     def __str__(self) -> str:
