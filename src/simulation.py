@@ -72,7 +72,7 @@ class SemiUniformStrategy(ABC):
         bandit.generate()
 
     @abstractmethod
-    def full_simulation( # noqa: ANN201
+    def full_simulation(  # noqa: ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass
@@ -85,7 +85,7 @@ class EpsilonGreegyStrategy(SemiUniformStrategy):
     epsilon.
     """
 
-    def full_simulation( #noqa ANN201
+    def full_simulation(  # noqa ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass
@@ -96,7 +96,7 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
     A pure exploration phase is followed by a pure exploitation phase.
     """
 
-    def full_simulation( #noqa ANN201
+    def full_simulation(  # noqa ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass
@@ -111,7 +111,7 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
 
     decay_rate: float
 
-    def full_simulation( #noqa ANN201
+    def full_simulation(  # noqa ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass
