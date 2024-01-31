@@ -43,7 +43,8 @@ def test_eq(bandit, mock_parameter_hat):
 
 
 def test_le(bandit, mock_parameter_hat):
-    assert bandit <= mock_parameter_hat and bandit < mock_parameter_hat + 0.1
+    assert bandit <= mock_parameter_hat
+    assert bandit < mock_parameter_hat + 0.1
 
 
 def test_lt(bandit, mock_parameter_hat):
@@ -51,7 +52,8 @@ def test_lt(bandit, mock_parameter_hat):
 
 
 def test_ge(bandit, mock_parameter_hat):
-    assert bandit >= mock_parameter_hat and bandit >= mock_parameter_hat - 0.1
+    assert bandit >= mock_parameter_hat
+    assert bandit >= mock_parameter_hat - 0.1
 
 
 def test_gt(bandit, mock_parameter_hat):

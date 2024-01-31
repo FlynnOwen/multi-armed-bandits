@@ -1,7 +1,7 @@
 from math import log, sqrt
 
 
-def ucb(q: float, t: int, c: float, q_t: int):
+def ucb(q: float, t: int, c: float, q_t: int) -> float:
     """
     Calculates the upper confidence bound.
 

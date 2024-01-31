@@ -22,7 +22,7 @@ class Simulation(ABC):
     _simulation_num: int = 0
 
     @property
-    def simulation_num(self):
+    def simulation_num(self) -> int:
         return self._simulation_num
 
     def full_simulation(self) -> None:
@@ -62,8 +62,7 @@ class SemiUniformStrategy(ABC):
         """
         if random_value <= self.random_bound:
             return self.bandit_collection.random_bandit
-        else:
-            return self.bandit_collection.optimal_bandit
+        return self.bandit_collection.optimal_bandit
 
     def simulate_one(self, bandit_collection: BanditCollection) -> None:
         random_value = self.gen_random_value()
@@ -73,7 +72,7 @@ class SemiUniformStrategy(ABC):
         bandit.generate()
 
     @abstractmethod
-    def full_simulation(
+    def full_simulation( # noqa: ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass
@@ -86,7 +85,7 @@ class EpsilonGreegyStrategy(SemiUniformStrategy):
     epsilon.
     """
 
-    def full_simulation(
+    def full_simulation( #noqa ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass
@@ -97,7 +96,7 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
     A pure exploration phase is followed by a pure exploitation phase.
     """
 
-    def full_simulation(
+    def full_simulation( #noqa ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass
@@ -112,7 +111,7 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
 
     decay_rate: float
 
-    def full_simulation(
+    def full_simulation( #noqa ANN201
         self, num_simulations: int, bandit_collection: BanditCollection
     ):
         pass

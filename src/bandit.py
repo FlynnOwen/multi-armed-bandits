@@ -18,7 +18,7 @@ class Bandit(ABC):
     _results: list[Any] = field(default_factory=list, init=False)
 
     @abstractmethod
-    def generate(self):
+    def generate(self) -> None:
         """
         'Pull' the armed bandit.
         The result is a value sampled from the distribution
@@ -29,14 +29,14 @@ class Bandit(ABC):
 
     @property
     @abstractmethod
-    def parameter_hat(self):
+    def parameter_hat(self) -> float:
         """
         The estimated parameter(s).
         """
 
     @property
     @abstractmethod
-    def residual(self):
+    def residual(self) -> float:
         """
         Residual between the true parameter(s)
         and the estimated parameter(s).
@@ -44,20 +44,20 @@ class Bandit(ABC):
 
     @property
     @abstractmethod
-    def reward(self):
+    def reward(self) -> float:
         """
         The total utility gained from this bandit.
         """
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._results)
 
     @abstractmethod
-    def __eq__(self, value: float):
+    def __eq__(self, value: float) -> bool:
         pass
 
     @abstractmethod
-    def __lt__(self, value: float):
+    def __lt__(self, value: float) -> bool:
         pass
 
 
@@ -69,7 +69,7 @@ class BernoulliBandit(Bandit):
     true_parameter: float
     _results: list[int] = field(default_factory=list, init=False)
 
-    def generate(self):
+    def generate(self) -> None:
         """
         Generates a single result from the pull of the
         armed bandit.
@@ -78,18 +78,17 @@ class BernoulliBandit(Bandit):
         self._results.append(result)
 
     @property
-    def parameter_hat(self):
+    def parameter_hat(self) -> float:
         """
         The estimated parameter for this bandit.
         Note that the Maximum Likelihood estimator is used.
         """
         if not self._results:
             return inf
-        else:
-            return sum(self._results) / len(self._results)
+        return sum(self._results) / len(self._results)
 
     @property
-    def residual(self):
+    def residual(self) -> float:
         """
         The difference between the true parameter of an armed
         bandit and the estimated parameter.
@@ -97,20 +96,20 @@ class BernoulliBandit(Bandit):
         return self.true_parameter - self.parameter_hat
 
     @property
-    def reward(self):
+    def reward(self) -> float:
         return sum(self._results)
 
     @property
-    def num_simulations(self):
+    def num_simulations(self) -> int:
         """
         Number of simulations that this armed bandit has performed.
         """
         return len(self._results)
 
-    def __eq__(self, value: float):
+    def __eq__(self, value: float) -> bool:
         return self.parameter_hat == value
 
-    def __lt__(self, value: float):
+    def __lt__(self, value: float) -> bool:
         return self.parameter_hat < value
 
 
@@ -122,10 +121,10 @@ class BanditCollection:
 
     bandits: list[Bandit]
 
-    def __iter__(self):
+    def __iter__(self) -> iter[Bandit]:
         return iter(self.bandits)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.bandits)
 
     @property
@@ -136,5 +135,5 @@ class BanditCollection:
     def random_bandit(self) -> Bandit:
         return choice(self.bandits)
 
-    def add_bandit(self, bandit: Bandit):
+    def add_bandit(self, bandit: Bandit) -> None:
         self.bandits.append(bandit)

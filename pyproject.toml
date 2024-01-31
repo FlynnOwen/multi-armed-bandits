@@ -36,8 +36,9 @@
 
 ignore = [
     "COM812", 
-    "ISC001"
- ] # conflicts
+    "ISC001",
+    "ANN101"
+ ]
  
  # Allow fix for all enabled rules (when --fix) is provided. (only safes fixes will be applied)
  fixable = ["ALL"]
@@ -45,6 +46,12 @@ ignore = [
  
  [tool.ruff.flake8-quotes]
  inline-quotes = "double"
+
+[tool.ruff.lint.per-file-ignores]
+"src/tests/*" = [
+    "ANN001",
+    "ANN201"
+    ]
  
  [tool.ruff.format]
  quote-style = "double"
