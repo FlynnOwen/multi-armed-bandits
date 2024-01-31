@@ -14,7 +14,8 @@ local-test: install-requirements
 
 # Linting
 lint:
-    ruff .
+    ruff check . --fix --exit-zero
 
 format:
-    black .
+    ruff check . --fix
+    ruff format .
