@@ -33,3 +33,6 @@ venv/
 
 # mac
 *.DS_Store
+
+# Linting
+.ruff_cache/*

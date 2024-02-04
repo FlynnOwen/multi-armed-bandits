@@ -1,16 +1,26 @@
 #!/usr/bin/env just --justfile
-export PYTHON_VERSION := "3.10"
+PYENV_NAME := 'multi_armed_bandits'
+PYTHON_VERSION := '3.11'
 
-# Virtual environment
+### Python Setup
+
+# Complete installation/reinstallation of the repo pyenv
 install-venv:
-    [ -d venv ] || python{{PYTHON_VERSION}} -m venv venv
+    pyenv virtualenv {{PYTHON_VERSION}} {{PYENV_NAME}}
+    pyenv local {{PYENV_NAME}}
 
+# Install requirements
 install-requirements: install-venv
-    ./venv/bin/python -m pip install -r requirements.txt
+    pip3 install --upgrade pip
+    pip3 install -r requirements.txt
+
+# Activates repo pyenv if exists, else runs installation
+pyenv-activate:
+    pyenv local {{PYENV_NAME}} || just install-venv
 
 # Testing
-local-test: install-requirements
-    ./venv/bin/python -m pytest
+local-test: pyenv-activate
+    python3 -m pytest
 
 # Linting
 lint:

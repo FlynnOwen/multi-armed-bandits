@@ -121,7 +121,7 @@ class BanditCollection:
 
     bandits: list[Bandit]
 
-    def __iter__(self) -> iter[Bandit]:
+    def __iter__(self):  # noqa: ANN204
         return iter(self.bandits)
 
     def __len__(self) -> int:
