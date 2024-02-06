@@ -16,17 +16,11 @@ class Simulation(ABC):
     """
     Base class for MAB simulations.
     """
-
     bandit_collection: BanditCollection
-    num_simulations: int
     strategy: SemiUniformStrategy
 
-    @property
-    def simulation_num(self) -> int:
-        return len(self.bandit_collection)
-
     def full_simulation(self) -> None:
-        self.strategy.full_simulation(self.num_simulations, self.bandit_collection)
+        self.strategy.full_simulation(self.bandit_collection)
 
 
 class SemiUniformStrategy(ABC):
@@ -40,7 +34,11 @@ class SemiUniformStrategy(ABC):
     num_simulations: int
     epsilon: float
 
-    def gen_random_value(self) -> float:
+    @property
+    def simulation_num(self) -> int:
+        return len(self.bandit_collection)
+
+    def gen_random_uniform(self) -> float:
         return uniform(a=0, b=1)
     
     @abstractmethod
@@ -80,7 +78,7 @@ class EpsilonGreegyStrategy(SemiUniformStrategy):
         return bandit_collection.optimal_bandit
 
     def simulate_one(self, bandit_collection: BanditCollection) -> None:
-        random_value = self.gen_random_value()
+        random_value = self.gen_random_uniform()
         bandit = self._bandit_strategy(
             random_value=random_value, bandit_collection=bandit_collection
         )
@@ -132,7 +130,7 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
         """
         Generates a single value from a bandit.
         """
-        random_value = self.gen_random_value()
+        random_value = self.gen_random_uniform()
         bandit = self._bandit_strategy(
             random_value=random_value, bandit_collection=bandit_collection
         )
