@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from random import uniform
+import math
 
 from tabulate import tabulate
 
@@ -19,21 +20,13 @@ class Simulation(ABC):
     bandit_collection: BanditCollection
     num_simulations: int
     strategy: SemiUniformStrategy
-    _simulation_num: int = 0
 
     @property
     def simulation_num(self) -> int:
-        return self._simulation_num
+        return len(self.bandit_collection)
 
     def full_simulation(self) -> None:
         self.strategy.full_simulation(self.num_simulations, self.bandit_collection)
-
-
-@dataclass
-class EpsilonSimulation(Simulation):
-    """
-    Simulations that involve 'Epsilon' strategies.
-    """
 
 
 class SemiUniformStrategy(ABC):
@@ -44,12 +37,34 @@ class SemiUniformStrategy(ABC):
     Semi-uniform strategies were the earliest (and simplest)
     strategies discovered to approximately solve the bandit problem.
     """
-
-    epsilon: float = 0.2
-    random_bound: float = 0.2
+    num_simulations: int
+    epsilon: float
 
     def gen_random_value(self) -> float:
         return uniform(a=0, b=1)
+    
+    @abstractmethod
+    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+        pass
+
+    def full_simulation(  # noqa ANN201
+        self, bandit_collection: BanditCollection
+    ):
+        [
+            self.simulate_one(bandit_collection=bandit_collection)
+            for _ in range(self.num_simulations)
+        ]
+        return bandit_collection
+
+
+class EpsilonGreegyStrategy(SemiUniformStrategy):
+    """
+    The best lever is selected for 1-epsilon of the trials,
+    and a lever is selected at (Uniform) random for a proportion
+    epsilon.
+    """
+
+    epsilon: float = 0.2
 
     def _bandit_strategy(
         self, random_value: float, bandit_collection: BanditCollection
@@ -60,9 +75,9 @@ class SemiUniformStrategy(ABC):
             bound, return a random bandit.
         - Otherwise return the current best bandit.
         """
-        if random_value <= self.random_bound:
-            return self.bandit_collection.random_bandit
-        return self.bandit_collection.optimal_bandit
+        if random_value <= self.epsilon:
+            return bandit_collection.random_bandit
+        return bandit_collection.optimal_bandit
 
     def simulate_one(self, bandit_collection: BanditCollection) -> None:
         random_value = self.gen_random_value()
@@ -71,50 +86,81 @@ class SemiUniformStrategy(ABC):
         )
         bandit.generate()
 
-    @abstractmethod
-    def full_simulation(  # noqa: ANN201
-        self, num_simulations: int, bandit_collection: BanditCollection
-    ):
-        pass
-
-
-class EpsilonGreegyStrategy(SemiUniformStrategy):
-    """
-    The best lever is selected for 1-epsilon of the trials,
-    and a lever is selected at (Uniform) random for a proportion
-    epsilon.
-    """
-
-    def full_simulation(  # noqa ANN201
-        self, num_simulations: int, bandit_collection: BanditCollection
-    ):
-        pass
-
-
-class EpsilonFirstStrategy(SemiUniformStrategy):
-    """
-    A pure exploration phase is followed by a pure exploitation phase.
-    """
-
-    def full_simulation(  # noqa ANN201
-        self, num_simulations: int, bandit_collection: BanditCollection
-    ):
-        pass
-
 
 class EpsilonDecreasingStrategy(SemiUniformStrategy):
     """
     Similar to EpsilonGreegyStrategy, but epsilon gradually decreases.
     This results in highly explorative behaviour, followed by highly
     exploitative behaviour.
+
+    NOTE: The formula for this strategy is:
+          epsilon_curr = e^{epsilon - (decay_rate * simulation_num)}
+
+    Is this therefore necessary that 0 <= decay_rate <= 1.
+    Choose lower values of decay_rate for more explorative
+    behaviour, and higher values for more exploitative behaviour.
+
+    Note that decay rate is proportional to the number of simulations,
+    and epsilon, all parameters should be kept in mind during selection.
     """
 
-    decay_rate: float
+    epsilon: float = 0.8
+    decay_rate: float = 0.05
 
-    def full_simulation(  # noqa ANN201
-        self, num_simulations: int, bandit_collection: BanditCollection
-    ):
-        pass
+    def __post_init__(self):
+        if 0 < self.decay_rate < 1:
+            raise ValueError("parameter decay_rate must be 0 < decay_rate < 1.")
+        
+    @property
+    def epsilon_curr(self) -> float:
+        return math.exp(self.epsilon - (self.decay_rate * self.simulation_num))
+
+    def _bandit_strategy(
+        self, random_value: float, bandit_collection: BanditCollection
+    ) -> Bandit:
+        """
+        Strategy for which bandit to generate:
+        - If a randomly generate value is less than the defined
+            bound, return a random bandit.
+        - Otherwise return the current best bandit.
+        """
+        if random_value <= self.epsilon_curr:
+            return bandit_collection.random_bandit
+        return bandit_collection.optimal_bandit
+
+    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+        """
+        Generates a single value from a bandit.
+        """
+        random_value = self.gen_random_value()
+        bandit = self._bandit_strategy(
+            random_value=random_value, bandit_collection=bandit_collection
+        )
+        bandit.generate()
+
+class EpsilonFirstStrategy(SemiUniformStrategy):
+    """
+    A pure exploration phase occurs for epsilon * num_simulations trials,
+    followed by a pure exploitation phase for (1 - epsilon) * num_simulations 
+    trials.
+    """
+
+    epsilon: float = 0.8
+
+    @property
+    def exploitation_phase(self) -> bool:
+        """
+        Boolean: Has the threshold for the exploitation phase passed.
+        """
+        return self.epsilon * self.num_simulations >= self.simulation_num
+
+    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+        if not self.exploitation_phase:
+            bandit = bandit_collection.random_bandit
+        else:
+            bandit = bandit_collection.optimal_bandit
+
+        bandit.generate()
 
 
 @dataclass
@@ -137,7 +183,7 @@ class UCBSimulation(Simulation):
             q=best_bandit.parameter_hat,
             t=self.num_simulations,
             c=self.exploitation_constant,
-            q_t=best_bandit.num_simulations,
+            q_t=len(best_bandit),
         )
 
 

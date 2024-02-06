@@ -99,13 +99,6 @@ class BernoulliBandit(Bandit):
     def reward(self) -> float:
         return sum(self._results)
 
-    @property
-    def num_simulations(self) -> int:
-        """
-        Number of simulations that this armed bandit has performed.
-        """
-        return len(self._results)
-
     def __eq__(self, value: float) -> bool:
         return self.parameter_hat == value
 
