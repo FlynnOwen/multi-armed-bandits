@@ -5,8 +5,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from random import uniform
 
-from tabulate import tabulate
-
 from src.bandit import Bandit, BanditCollection
 from src.utils.utils import ucb
 
@@ -16,6 +14,7 @@ class Simulation:
     """
     Base class for MAB simulations.
     """
+
     bandit_collection: BanditCollection
     strategy: SemiUniformStrategy
 
@@ -32,6 +31,7 @@ class SemiUniformStrategy(ABC):
     Semi-uniform strategies were the earliest (and simplest)
     strategies discovered to approximately solve the bandit problem.
     """
+
     bandit_collection: BanditCollection
     num_simulations: int
     epsilon: float
@@ -53,13 +53,12 @@ class SemiUniformStrategy(ABC):
         Raises an exception if simulation_num > num_simulations.
         """
         if self.simulation_num >= self.num_simulations:
-            raise Exception(f"There have already been {self.simulation_num} simulations"
-                            f"Consdier using simulate(desired_number) for "
-                            f"executing more simulations.")
-        [
-            self.simulate_one()
-            for _ in range(self.simulation_num, self.num_simulations)
-        ]
+            raise Exception(
+                f"There have already been {self.simulation_num} simulations"
+                f"Consdier using simulate(desired_number) for "
+                f"executing more simulations."
+            )
+        [self.simulate_one() for _ in range(self.simulation_num, self.num_simulations)]
         return self.bandit_collection
 
     def simulate(self, num_sims: int) -> BanditCollection:
@@ -67,10 +66,7 @@ class SemiUniformStrategy(ABC):
         Executes exactly num_sims simulations, regardless of how many have occurred
         previously and what the value self.num_simulations is set to.
         """
-        [
-            self.simulate_one()
-            for _ in range(num_sims)
-        ]
+        [self.simulate_one() for _ in range(num_sims)]
         return self.bandit_collection
 
 
@@ -199,46 +195,4 @@ class UCBSimulation(Simulation):
             t=self.num_simulations,
             c=self.exploitation_constant,
             q_t=len(best_bandit),
-        )
-
-
-@dataclass
-class Metrics:
-    """
-    Simulation incorporating the Upper Confidence Bound (UCB).
-
-    NOTE: This is incomplete
-    """
-
-    bandit_collection: BanditCollection
-
-    @property
-    def total_sims(self) -> int:
-        return sum([len(bandit) for bandit in self.bandit_collection])
-
-    @property
-    def _ae(self) -> float:
-        return sum([bandit.residual for bandit in self.bandit_collection])
-
-    @property
-    def mae(self) -> float:
-        return self._ae / len(self.bandit_collection)
-
-    @property
-    def total_reward(self) -> float:
-        return sum([bandit.reward for bandit in self.bandit_collection])
-
-    @property
-    def mape(self) -> float:
-        return sum(
-            [
-                bandit.residual / bandit.true_parameter
-                for bandit in self.bandit_collection
-            ],
-        ) / len(self.bandit_collection)
-
-    def __str__(self) -> str:
-        return tabulate(
-            data=[self.total_sims, self.total_reward, self.mape, self.mae],
-            headers=["total simulations", "total reward", "mape", "mae"],
         )
