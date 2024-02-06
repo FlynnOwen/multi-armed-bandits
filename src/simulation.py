@@ -23,6 +23,7 @@ class Simulation:
         self.strategy.full_simulation(self.bandit_collection)
 
 
+@dataclass
 class SemiUniformStrategy(ABC):
     """
     Implements the strategy pattern for 'Semi-Uniform' strategies
@@ -31,31 +32,31 @@ class SemiUniformStrategy(ABC):
     Semi-uniform strategies were the earliest (and simplest)
     strategies discovered to approximately solve the bandit problem.
     """
+    bandit_collection: BanditCollection
     num_simulations: int
     epsilon: float
 
     @property
     def simulation_num(self) -> int:
-        return len(self.bandit_collection)
+        return self.bandit_collection.simulation_num
 
     def gen_random_uniform(self) -> float:
         return uniform(a=0, b=1)
 
     @abstractmethod
-    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+    def simulate_one(self) -> None:
         pass
 
-    def full_simulation(  # noqa ANN201
-        self, bandit_collection: BanditCollection
-    ):
+    def full_simulation(self) -> BanditCollection:
         [
-            self.simulate_one(bandit_collection=bandit_collection)
+            self.simulate_one(bandit_collection=self.bandit_collection)
             for _ in range(self.num_simulations)
         ]
-        return bandit_collection
+        return self.bandit_collection
 
 
-class EpsilonGreegyStrategy(SemiUniformStrategy):
+@dataclass
+class EpsilonGreedyStrategy(SemiUniformStrategy):
     """
     The best lever is selected for 1-epsilon of the trials,
     and a lever is selected at (Uniform) random for a proportion
@@ -64,9 +65,7 @@ class EpsilonGreegyStrategy(SemiUniformStrategy):
 
     epsilon: float = 0.2
 
-    def _bandit_strategy(
-        self, random_value: float, bandit_collection: BanditCollection
-    ) -> Bandit:
+    def _bandit_strategy(self, random_value: float) -> Bandit:
         """
         Strategy for which bandit to generate:
         - If a randomly generate value is less than the defined
@@ -74,17 +73,18 @@ class EpsilonGreegyStrategy(SemiUniformStrategy):
         - Otherwise return the current best bandit.
         """
         if random_value <= self.epsilon:
-            return bandit_collection.random_bandit
-        return bandit_collection.optimal_bandit
+            return self.bandit_collection.random_bandit
+        return self.bandit_collection.optimal_bandit
 
-    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+    def simulate_one(self) -> None:
         random_value = self.gen_random_uniform()
         bandit = self._bandit_strategy(
-            random_value=random_value, bandit_collection=bandit_collection
+            random_value=random_value, bandit_collection=self.bandit_collection
         )
         bandit.generate()
 
 
+@dataclass
 class EpsilonDecreasingStrategy(SemiUniformStrategy):
     """
     Similar to EpsilonGreegyStrategy, but epsilon gradually decreases.
@@ -113,9 +113,7 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
     def epsilon_curr(self) -> float:
         return math.exp(self.epsilon - (self.decay_rate * self.simulation_num))
 
-    def _bandit_strategy(
-        self, random_value: float, bandit_collection: BanditCollection
-    ) -> Bandit:
+    def _bandit_strategy(self, random_value: float) -> Bandit:
         """
         Strategy for which bandit to generate:
         - If a randomly generate value is less than the defined
@@ -123,19 +121,21 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
         - Otherwise return the current best bandit.
         """
         if random_value <= self.epsilon_curr:
-            return bandit_collection.random_bandit
-        return bandit_collection.optimal_bandit
+            return self.bandit_collection.random_bandit
+        return self.bandit_collection.optimal_bandit
 
-    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+    def simulate_one(self) -> None:
         """
         Generates a single value from a bandit.
         """
         random_value = self.gen_random_uniform()
         bandit = self._bandit_strategy(
-            random_value=random_value, bandit_collection=bandit_collection
+            random_value=random_value, bandit_collection=self.bandit_collection
         )
         bandit.generate()
 
+
+@dataclass
 class EpsilonFirstStrategy(SemiUniformStrategy):
     """
     A pure exploration phase occurs for epsilon * num_simulations trials,
@@ -152,11 +152,11 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
         """
         return self.epsilon * self.num_simulations >= self.simulation_num
 
-    def simulate_one(self, bandit_collection: BanditCollection) -> None:
+    def simulate_one(self) -> None:
         if not self.exploitation_phase:
-            bandit = bandit_collection.random_bandit
+            bandit = self.bandit_collection.random_bandit
         else:
-            bandit = bandit_collection.optimal_bandit
+            bandit = self.bandit_collection.optimal_bandit
 
         bandit.generate()
 

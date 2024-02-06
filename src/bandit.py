@@ -121,6 +121,10 @@ class BanditCollection:
         return len(self.bandits)
 
     @property
+    def simulation_num(self) -> int:
+        return sum([len(bandit) for bandit in self.bandits])
+
+    @property
     def optimal_bandit(self) -> Bandit:
         return self.bandits[self.bandits.index(max(self.bandits))]
 
