@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from random import uniform
-import math
 
 from tabulate import tabulate
 
@@ -12,7 +12,7 @@ from src.utils.utils import ucb
 
 
 @dataclass
-class Simulation(ABC):
+class Simulation:
     """
     Base class for MAB simulations.
     """
@@ -40,7 +40,7 @@ class SemiUniformStrategy(ABC):
 
     def gen_random_uniform(self) -> float:
         return uniform(a=0, b=1)
-    
+
     @abstractmethod
     def simulate_one(self, bandit_collection: BanditCollection) -> None:
         pass
@@ -108,7 +108,7 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
     def __post_init__(self):
         if 0 < self.decay_rate < 1:
             raise ValueError("parameter decay_rate must be 0 < decay_rate < 1.")
-        
+
     @property
     def epsilon_curr(self) -> float:
         return math.exp(self.epsilon - (self.decay_rate * self.simulation_num))
@@ -139,7 +139,7 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
 class EpsilonFirstStrategy(SemiUniformStrategy):
     """
     A pure exploration phase occurs for epsilon * num_simulations trials,
-    followed by a pure exploitation phase for (1 - epsilon) * num_simulations 
+    followed by a pure exploitation phase for (1 - epsilon) * num_simulations
     trials.
     """
 
