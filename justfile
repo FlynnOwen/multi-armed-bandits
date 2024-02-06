@@ -27,5 +27,5 @@ lint:
     ruff check . --fix --exit-zero
 
 format:
-    ruff check . --fix
+    just lint
     ruff format .
