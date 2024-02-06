@@ -4,9 +4,9 @@ from random import random
 import pytest
 
 from src.bandit import BanditCollection, BernoulliBandit
-from src.simulation import (EpsilonFirstStrategy,
-                            EpsilonGreedyStrategy,
-                            EpsilonDecreasingStrategy)
+from src.simulation import (
+    EpsilonGreedyStrategy,
+)
 
 
 @pytest.fixture(scope="module")
@@ -57,19 +57,15 @@ def test_simulate_one(epsilon_greedy_strategy: EpsilonGreedyStrategy):
 
     assert epsilon_greedy_strategy.simulation_num == 1
     assert min(epsilon_greedy_strategy.bandit_collection).parameter_hat in {0, 1}
-    assert min(epsilon_greedy_strategy.bandit_collection).num_simulations == 1
+    assert len(min(epsilon_greedy_strategy.bandit_collection)) == 1
 
 
 def test_simulation(epsilon_greedy_strategy: EpsilonGreedyStrategy):
-    epsilon_greedy_strategy.simulation()
+    epsilon_greedy_strategy.full_simulation()
     expected_simulations = epsilon_greedy_strategy.num_simulations
-    bandit_sims = [
-        bandit.num_simulations
-        for bandit in epsilon_greedy_strategy.bandit_collection.bandits
-    ]
 
     assert epsilon_greedy_strategy.simulation_num == expected_simulations
-    assert sum(bandit_sims) == expected_simulations
+    assert epsilon_greedy_strategy.num_simulations == expected_simulations
 
     # We expect that each bandit is pulled atleast once
-    assert min(bandit_sims) > 0
+    assert len(min(epsilon_greedy_strategy.bandit_collection)) > 0

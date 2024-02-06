@@ -48,9 +48,28 @@ class SemiUniformStrategy(ABC):
         pass
 
     def full_simulation(self) -> BanditCollection:
+        """
+        Executes self.simulate_one up until num_simulations has been reached.
+        Raises an exception if simulation_num > num_simulations.
+        """
+        if self.simulation_num >= self.num_simulations:
+            raise Exception(f"There have already been {self.simulation_num} simulations"
+                            f"Consdier using simulate(desired_number) for "
+                            f"executing more simulations.")
         [
-            self.simulate_one(bandit_collection=self.bandit_collection)
-            for _ in range(self.num_simulations)
+            self.simulate_one()
+            for _ in range(self.simulation_num, self.num_simulations)
+        ]
+        return self.bandit_collection
+
+    def simulate(self, num_sims: int) -> BanditCollection:
+        """
+        Executes exactly num_sims simulations, regardless of how many have occurred
+        previously and what the value self.num_simulations is set to.
+        """
+        [
+            self.simulate_one()
+            for _ in range(num_sims)
         ]
         return self.bandit_collection
 
@@ -78,9 +97,7 @@ class EpsilonGreedyStrategy(SemiUniformStrategy):
 
     def simulate_one(self) -> None:
         random_value = self.gen_random_uniform()
-        bandit = self._bandit_strategy(
-            random_value=random_value, bandit_collection=self.bandit_collection
-        )
+        bandit = self._bandit_strategy(random_value=random_value)
         bandit.generate()
 
 
