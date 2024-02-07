@@ -62,4 +62,3 @@ class Metrics:
         Generates plots to stdout of the multiarmed
         bandit simulation process.
         """
-        pass
