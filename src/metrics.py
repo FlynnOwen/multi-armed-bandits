@@ -54,3 +54,12 @@ class Metrics:
              tablefmt="rounded_outline",
              numalign="left"
         )
+
+    def plots(self) -> None:
+        """
+        NOTE: Currently unimplemented.
+
+        Generates plots to stdout of the multiarmed
+        bandit simulation process.
+        """
+        pass
