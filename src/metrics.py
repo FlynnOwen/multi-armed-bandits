@@ -12,6 +12,7 @@ class Metrics:
     """
 
     bandit_collection: BanditCollection
+    rounding_dp: int = 2
 
     @property
     def num_simulations(self) -> int:
@@ -19,11 +20,12 @@ class Metrics:
 
     @property
     def _ae(self) -> float:
-        return sum([abs(bandit.residual) for bandit in self.bandit_collection])
+        return round(sum([abs(bandit.residual) for bandit in self.bandit_collection]),
+                     self.rounding_dp)
 
     @property
     def mae(self) -> float:
-        return self._ae / len(self.bandit_collection)
+        return round(self._ae / len(self.bandit_collection), self.rounding_dp)
 
     @property
     def total_reward(self) -> float:
@@ -31,15 +33,24 @@ class Metrics:
 
     @property
     def mape(self) -> float:
-        return sum(
+        return round(
+            sum(
             [
                 abs(bandit.residual) / bandit.true_parameter
                 for bandit in self.bandit_collection
             ],
-        ) / len(self.bandit_collection)
+        ) / len(self.bandit_collection),
+        self.rounding_dp)
 
     def __str__(self) -> str:
         return tabulate(
-            data=[self.total_sims, self.total_reward, self.mape, self.mae],
-            headers=["total simulations", "total reward", "mape", "mae"],
+            [
+                ["total simulations", self.num_simulations],
+                ["total reward", self.total_reward],
+                ["mape", self.mape],
+                ["mae", self.mae]
+             ],
+             headers=["metric", "value"],
+             tablefmt="rounded_outline",
+             numalign="left"
         )
