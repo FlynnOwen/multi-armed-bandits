@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from random import uniform
+from typing import Any
 
 from src.bandit import Bandit, BanditCollection
 from src.utils.utils import ucb
@@ -35,7 +36,7 @@ class SemiUniformStrategy(ABC):
     bandit_collection: BanditCollection
     num_simulations: int
     epsilon: float
-    results: list[int]
+    results: list[Any] = field(default_factory=list, init=False)
 
     def __post_init__(self):
         if 0 > self.epsilon < 1:
