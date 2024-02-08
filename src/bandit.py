@@ -2,8 +2,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import total_ordering
 from math import inf
-from random import choice, randint
+from random import choice
 from typing import Any
+
+from numpy.random import binomial
 
 
 @dataclass
@@ -79,7 +81,7 @@ class BernoulliBandit(Bandit):
         Generates a single result from the pull of the
         armed bandit.
         """
-        result = randint(0, 1)
+        result = binomial(1, p=self.true_parameter)
         self._results.append(result)
 
     @property
