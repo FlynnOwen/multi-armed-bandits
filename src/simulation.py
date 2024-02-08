@@ -36,6 +36,10 @@ class SemiUniformStrategy(ABC):
     num_simulations: int
     epsilon: float
 
+    def __post_init__(self):
+        if 0 > self.epsilon < 1:
+            raise ValueError(f"epsilon must be 0 <= epsilon <= 1"
+                             f"got value {self.epsilon} instead.")
     @property
     def simulation_num(self) -> int:
         return self.bandit_collection.simulation_num
