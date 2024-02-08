@@ -9,14 +9,14 @@ install-venv:
     pyenv virtualenv {{PYTHON_VERSION}} {{PYENV_NAME}}
     pyenv local {{PYENV_NAME}}
 
-# Install requirements
-install-requirements: install-venv
-    pip3 install --upgrade pip
-    pip3 install -r requirements.txt
-
 # Activates repo pyenv if exists, else runs installation
 pyenv-activate:
     pyenv local {{PYENV_NAME}} || just install-venv
+
+# Install requirements
+install-requirements: pyenv-activate
+    pip3 install --upgrade pip
+    pip3 install -r requirements.txt
 
 # Testing
 local-test: pyenv-activate

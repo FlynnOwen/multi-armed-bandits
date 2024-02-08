@@ -36,3 +36,6 @@ venv/
 
 # Linting
 .ruff_cache/*
+
+# Development
+*.ipynb
