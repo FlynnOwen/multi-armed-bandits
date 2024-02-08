@@ -76,13 +76,15 @@ class BernoulliBandit(Bandit):
             raise ValueError(f"true_parameter must be 0 <= true_parameter <= 1"
                              f"got value {self.true_parameter} instead.")
 
-    def generate(self) -> None:
+    def generate(self) -> float:
         """
         Generates a single result from the pull of the
         armed bandit.
         """
         result = binomial(1, p=self.true_parameter)
         self._results.append(result)
+
+        return result
 
     @property
     def parameter_hat(self) -> float:

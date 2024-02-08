@@ -35,6 +35,7 @@ class SemiUniformStrategy(ABC):
     bandit_collection: BanditCollection
     num_simulations: int
     epsilon: float
+    results: list[int]
 
     def __post_init__(self):
         if 0 > self.epsilon < 1:
@@ -98,7 +99,8 @@ class EpsilonGreedyStrategy(SemiUniformStrategy):
     def simulate_one(self) -> None:
         random_value = self.gen_random_uniform()
         bandit = self._bandit_strategy(random_value=random_value)
-        bandit.generate()
+        result = bandit.generate()
+        self.results.append(result)
 
 
 @dataclass
@@ -149,7 +151,8 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
         bandit = self._bandit_strategy(
             random_value=random_value, bandit_collection=self.bandit_collection
         )
-        bandit.generate()
+        result = bandit.generate()
+        self.results.append(result)
 
 
 @dataclass
@@ -175,7 +178,8 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
         else:
             bandit = self.bandit_collection.optimal_bandit
 
-        bandit.generate()
+        result = bandit.generate()
+        self.results.append(result)
 
 
 @dataclass
