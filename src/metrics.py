@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from tabulate import tabulate
 import seaborn as sns
+import matplotlib.pyplot as plt
 import numpy as np
 
 from src.simulation import SemiUniformStrategy
@@ -69,12 +70,24 @@ class Metrics:
 
     def plots(self) -> None:
         """
-        NOTE: Currently unimplemented.
-
         Generates plots to stdout of the multiarmed
         bandit simulation process.
-
-        ref: https://seaborn.pydata.org/tutorial/introduction
         """
-        sns.relplot(data=self.average_reward_timeseries,
-            kind="line")
+        sns.set_style("darkgrid")
+        ax = sns.lineplot(data=self.average_reward_timeseries)
+
+        plt.axhline(y=self.bandit_collection.optimal_bandit.parameter_hat,
+                    color="r",
+                    linestyle="--",
+                    label="Optimal Bandit Estimated Parameter")
+        plt.axhline(y=0.5,
+                    color="g",
+                    linestyle="--",
+                    label="Optimal Bandit True Parameter")
+
+        ax.set(title="Simulation Reward Over Time",
+            xlabel="Simulation Number",
+            ylabel="Average Reward")
+
+        plt.legend()
+        plt.show()
