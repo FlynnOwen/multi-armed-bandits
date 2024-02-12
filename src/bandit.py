@@ -73,8 +73,10 @@ class BernoulliBandit(Bandit):
 
     def __post_init__(self):
         if 0 > self.true_parameter < 1:
-            raise ValueError(f"true_parameter must be 0 <= true_parameter <= 1"
-                             f"got value {self.true_parameter} instead.")
+            raise ValueError(
+                f"true_parameter must be 0 <= true_parameter <= 1"
+                f"got value {self.true_parameter} instead."
+            )
 
     def generate(self) -> float:
         """
