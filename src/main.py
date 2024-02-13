@@ -53,10 +53,39 @@ def main(
     num_bandits: int,
     print_metrics: bool,
     print_plots: bool,
+    parameter_one_mean: float,
+    parameter_two_mean: float,
+    epsilon: float,
+    decay_rate: float,
+    parameter_one_values: list[float],
+    parameter_two_values: list[float],
 ) -> None:
     sel_distribution = distribution_factory(distribution=distirbution)
-    sel_strategy = strategy_factory(strategy=strategy)
+    if parameter_one_values is None:
+        # Generate bandits according to distribution
+        pass
+    else:
+        # Generate bandits using defined values
+        pass
+    if parameter_two_values is None:
+        # Generate bandits according to distribution
+        pass
+    else:
+        # Generate bandits using defined values
+        pass
 
+    # TODO: Find out how to pass decay_rate
+    sel_strategy = strategy_factory(bandit_collection=...,
+                                    strategy=strategy,
+                                    epsilon=epsilon,
+                                    num_simulations=num_simulations)
+    sel_strategy.full_simulation()
+    metrics = Metrics(...)
+
+    if print_plots:
+        metrics.generate_plots()
+    if print_metrics:
+        print(metrics)  #noqa: T201
 
 @app.command()
 def simulate(
