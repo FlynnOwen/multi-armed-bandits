@@ -1,9 +1,11 @@
+import json
 from enum import Enum
+from pathlib import Path
 from typing import Annotated
 
 import typer
 
-from src.bandit import BanditCollection, BernoulliBandit  # noqa: F401
+from src.bandit import Bandit, BanditCollection, BernoulliBandit  # noqa: F401
 from src.metrics import Metrics  # noqa: F401
 from src.simulation import (
     EpsilonDecreasingStrategy,
@@ -20,7 +22,7 @@ class Distribution(str, Enum):
     gaussian = "gaussian"
 
 
-def distribution_factory(distribution: Distribution, **kwargs) -> SemiUniformStrategy:  # noqa: ANN003
+def distribution_factory(distribution: Distribution, **kwargs) -> Bandit:  # noqa: ANN003
     distribution_map = {
         Distribution.bernoulli: BernoulliBandit,
     }
@@ -44,6 +46,18 @@ def strategy_factory(strategy: Strategy, **kwargs) -> SemiUniformStrategy:  # no
     return strategy_map[strategy](**kwargs)
 
 
+def main(
+    strategy: Strategy,
+    distirbution: Distribution,
+    num_simulations: int,
+    num_bandits: int,
+    print_metrics: bool,
+    print_plots: bool,
+) -> None:
+    sel_distribution = distribution_factory(distribution=distirbution)
+    sel_strategy = strategy_factory(strategy=strategy)
+
+
 @app.command()
 def simulate(
     strategy: Strategy = Strategy.epsilon_greedy.value,
@@ -52,13 +66,33 @@ def simulate(
     num_bandits: Annotated[int, typer.Option(min=2)] = 10,
     print_metrics: bool = False,
     print_plots: bool = False,
-    **kwargs,
+    parameter_one_mean: float = 0.5,
+    parameter_two_mean: float = None,
+    epsilon: float = 0.2,
+    decay_rate: float = 0.05,
+    parameter_one_values: list[float] = None,
+    parameter_two_values: list[float] = None,
 ) -> None:  # noqa: ANN003
     """
-    Run a multi-armed bandit simulation.
+    Runs a multi-armed bandit simulation.
     """
     pass  # noqa: PIE790
 
 
+@app.command()
+def simulate_from_json(config: Path) -> None:
+    """
+    Runs a multi-armed bandit simulation with
+    configuration (arguments) provided via a json
+    file.
+
+    TODO: Create example json schema.
+    """
+    if not config.is_file() and config.suffix != ".json":
+        raise ValueError("config must be a file with .json suffix")
+    simulation_args = json.load(config)
+    simulate(**simulation_args)
+
+
 if __name__ == "__main__":
-    typer.run(simulate)
+    app()
