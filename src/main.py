@@ -21,6 +21,16 @@ class Distribution(str, Enum):
     bernoulli = "bernoulli"
     gaussian = "gaussian"
 
+    @classmethod
+    @property
+    def one_parameter_family(cls): #noqa: ANN206
+        return {cls.bernoulli}
+
+    @classmethod
+    @property
+    def two_parameter_family(cls): #noqa: ANN206
+        return {cls.gaussian}
+
 
 def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
     distribution_map = {
@@ -80,6 +90,7 @@ def _validate_args(
         num_bandits: int,
         strategy: Strategy,
         distribution: Distribution,
+        num_simulations: int,
         decay_rate: float,
         parameter_one_values: list[float],
         parameter_two_values: list[float]
@@ -87,7 +98,24 @@ def _validate_args(
     """
     Validate complex arguments pass to simulate().
     """
-    pass
+    if strategy == Strategy.epsilon_decreasing and decay_rate is None:
+        raise ValueError("Arg 'decay_rate' must be passed if using strategy"
+                         "'epsilon_first'.")
+
+    if distribution in Distribution.two_parameter_family and parameter_two_values is None: # noqa: E501
+        raise ValueError(f"Distribution {distribution.value} requires two"
+                         "parameters, rather than one. Please pass values for arg"
+                         "'parameter_two_values'")
+
+    if num_bandits != len(parameter_one_values):
+        raise ValueError("Length of parameter 'parameter_one_values' must be equal to"
+                         f"parameter 'num_bandits'. Got {len(parameter_one_values)}"
+                         f"and {num_bandits} respectively.")
+
+    if num_bandits is not None and num_simulations != len(parameter_two_values): # noqa: E501
+        raise ValueError("Length of parameter 'parameter_two_values' must be equal to"
+                         f"parameter 'num_bandits'. Got {len(parameter_two_values)}"
+                         f"and {num_bandits} respectively.")
 
 @app.command()
 def simulate(
@@ -97,7 +125,7 @@ def simulate(
     num_bandits: Annotated[int, typer.Option(min=2)] = 10,
     print_metrics: bool = False,
     print_plots: bool = False,
-    epsilon: float = 0.2,
+    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
     decay_rate: float = 0.05,
     parameter_one_values: list[float] = [0.1, 0.1, 0.1, 0.1, 0.1,
                                          0.1, 0.1, 0.1 ,0.1 ,0.5],
@@ -106,6 +134,15 @@ def simulate(
     """
     Runs a multi-armed bandit simulation.
     """
+    _validate_args(
+        num_bandits=num_bandits,
+        strategy=strategy,
+        distribution=distribution,
+        num_simulations=num_simulations,
+        decay_rate=decay_rate,
+        parameter_one_values=parameter_one_values,
+        parameter_two_values=parameter_two_values
+    )
     main(strategy=strategy,
          distirbution=distribution,
          num_simulations=num_simulations,
