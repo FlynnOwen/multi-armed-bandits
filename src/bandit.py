@@ -14,6 +14,7 @@ class Bandit(ABC):
 
     Note that bandits may follow different distributions (e.g) Bernoulli.
     """
+    num_parameters = 1
 
     def __init__(self,
                  parameter: float) -> None:
@@ -69,6 +70,7 @@ class Bandit(ABC):
 
 
 class TwoParameterBandit(Bandit):
+    num_parameters = 2
 
     def __init__(self,
                  parameter: float,
@@ -142,6 +144,9 @@ class BanditCollection:
 
     bandits: list[Bandit]
 
+    def __post_init__(self):
+        self.num_parameters = self.random_bandit.num_parameters
+
     def __iter__(self):  # noqa: ANN204
         return iter(self.bandits)
 
@@ -159,6 +164,3 @@ class BanditCollection:
     @property
     def random_bandit(self) -> Bandit:
         return choice(self.bandits)
-
-    def add_bandit(self, bandit: Bandit) -> None:
-        self.bandits.append(bandit)

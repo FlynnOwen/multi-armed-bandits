@@ -53,20 +53,12 @@ class Metrics:
             self.rounding_dp,
         )
 
-    @property
-    def average_reward_timeseries(self) -> list[float]:
-        return list(
-            (
-                np.cumsum(self.simulation.results)
-                / np.arange(1, self.num_simulations + 1)
-            ).round(self.rounding_dp)
-        )
-
     def __str__(self) -> str:
         return tabulate(
             [
                 ["best parameter hat",
-                 round(self.bandit_collection.optimal_bandit.parameter_hat, 2)],
+                 round(self.bandit_collection.optimal_bandit.parameter_hat,
+                       self.rounding_dp)],
                  ["best parameter true",
                  self.bandit_collection.optimal_bandit.parameter],
                 ["total simulations", self.num_simulations],
@@ -79,6 +71,15 @@ class Metrics:
             numalign="left",
         )
 
+    @property
+    def average_reward_timeseries(self) -> list[float]:
+        return list(
+            (
+                np.cumsum(self.simulation.results)
+                / np.arange(1, self.num_simulations + 1)
+            ).round(self.rounding_dp)
+        )
+
     def residual_barplots(self) -> None:
         """
         Barplots showing estimated vs true Parameter
@@ -86,7 +87,7 @@ class Metrics:
         """
         parameters = [
             bandit.parameter_hat for bandit in self.bandit_collection.bandits
-        ] + [bandit.true_parameter for bandit in self.bandit_collection.bandits]
+        ] + [bandit.parameter for bandit in self.bandit_collection.bandits]
 
         parameter_types = ["Estimated" for _ in range(len(self.bandit_collection))] + [
             "True" for _ in range(len(self.bandit_collection))
@@ -122,13 +123,13 @@ class Metrics:
         simulation_counts = [len(bandit) for bandit in self.bandit_collection]
         abs_residuals = [abs(bandit.residual) for bandit in self.bandit_collection]
         sim_counts_residuals = pd.DataFrame(
-            {"Number of Pulls": simulation_counts, "Absolute Resdidual": abs_residuals}
+            {"Number of Pulls": simulation_counts, "Absolute Residual": abs_residuals}
         )
 
         ax = sns.scatterplot(
             color="r",
             data=sim_counts_residuals,
-            x="Absolute Resdidual",
+            x="Absolute Residual",
             y="Number of Pulls",
         )
         ax.set(title="Number of Bandit Pulls vs Absolute Residual of Bandit")
