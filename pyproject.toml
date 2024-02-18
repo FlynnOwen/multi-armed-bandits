@@ -38,7 +38,9 @@ ignore = [
     "COM812", 
     "ISC001",
     "ANN101",
-    "ANN204"
+    "ANN102",
+    "ANN204",
+    "F541"
  ]
  
  # Allow fix for all enabled rules (when --fix) is provided. (only safes fixes will be applied)
