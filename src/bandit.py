@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import total_ordering
 from math import inf
 from random import choice
-from typing import Any
 
 from numpy.random import binomial
 
 
+@total_ordering
 class Bandit(ABC):
     """
     Base class for a Bandit.
@@ -16,8 +16,8 @@ class Bandit(ABC):
     """
 
     def __init__(self,
-                 true_parameter: float) -> None:
-        self.true_parameter = true_parameter
+                 parameter: float) -> None:
+        self.parameter = parameter
         self._results: list[float] = []
 
     @abstractmethod
@@ -34,16 +34,25 @@ class Bandit(ABC):
     @abstractmethod
     def parameter_hat(self) -> float:
         """
-        The estimated parameter(s).
+        The estimated primary parameter.
         """
 
+    def _residual(self,
+                  parameter: float,
+                  parameter_hat: float) -> float:
+        """
+        Calculate difference between a true
+        parameter and an estimated parameter.
+        """
+        return parameter - parameter_hat
+
     @property
-    @abstractmethod
     def residual(self) -> float:
         """
-        Residual between the true parameter(s)
-        and the estimated parameter(s).
+        Residual between the true primary parameter
+        and the estimated primary parameter.
         """
+        return self._residual(self.parameter, self.parameter_hat)
 
     @property
     def reward(self) -> float:
@@ -59,25 +68,49 @@ class Bandit(ABC):
         return self.parameter_hat < value
 
 
-@total_ordering
+class TwoParameterBandit(Bandit):
+
+    def __init__(self,
+                 parameter: float,
+                 secondary_parameter: float) -> None:
+        super().__init__(parameter)
+        self.secondary_parameter = secondary_parameter
+
+    @property
+    @abstractmethod
+    def secondary_parameter_hat(self) -> float:
+        """
+        The estimated secondary parameter.
+        """
+
+    @property
+    def secondary_residual(self) -> float:
+        """
+        Residual between the true secondary parameter
+        and the estimated seconday parameter.
+        """
+        return self._residual(self.secondary_parameter, self.secondary_parameter_hat)
+
+
+
 class BernoulliBandit(Bandit):
     """Single bandit, simulating over a Bernoulli distribution."""
 
     def __init__(self,
-                 true_parameter: float) -> None:
-        if 0 > true_parameter < 1:
+                 parameter: float) -> None:
+        if 0 > parameter < 1:
             raise ValueError(
-                f"true_parameter must be 0 <= true_parameter <= 1"
-                f"got value {true_parameter} instead."
+                f"parameter must be 0 <= parameter <= 1"
+                f"got value {parameter} instead."
             )
-        super().__init__(true_parameter)
+        super().__init__(parameter)
 
     def generate(self) -> float:
         """
         Generates a single result from the pull of the
         armed bandit.
         """
-        result = binomial(1, p=self.true_parameter)
+        result = binomial(1, p=self.parameter)
         self._results.append(result)
 
         return result
@@ -98,7 +131,7 @@ class BernoulliBandit(Bandit):
         The difference between the true parameter of an armed
         bandit and the estimated parameter.
         """
-        return self.true_parameter - self.parameter_hat
+        return self.parameter - self.parameter_hat
 
 
 @dataclass

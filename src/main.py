@@ -70,7 +70,7 @@ def main(
 ) -> None:
     sel_distribution = distribution_factory(distribution=distirbution)
 
-    bandit_collection = BanditCollection([sel_distribution(true_parameter=value)
+    bandit_collection = BanditCollection([sel_distribution(parameter=value)
                                           for value in parameter_one_values])
     sel_strategy = strategy_factory(strategy=strategy,
                                     bandit_collection=bandit_collection,

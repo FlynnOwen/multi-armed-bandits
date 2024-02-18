@@ -12,7 +12,7 @@ def mock_parameter_hat():
 
 
 @pytest.fixture()
-def true_parameter():
+def parameter():
     return 0.5
 
 
@@ -31,8 +31,8 @@ def test_optimal_bandit(bandit_collection: BanditCollection):
 
 
 @pytest.fixture()
-def bandit(true_parameter, monkeypatch, mock_parameter_hat):
-    bandit = BernoulliBandit(true_parameter)
+def bandit(parameter, monkeypatch, mock_parameter_hat):
+    bandit = BernoulliBandit(parameter)
     monkeypatch.setattr(BernoulliBandit, "parameter_hat", mock_parameter_hat)
 
     return bandit

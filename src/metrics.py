@@ -45,7 +45,7 @@ class Metrics:
         return round(
             sum(
                 [
-                    abs(bandit.residual) / bandit.true_parameter
+                    abs(bandit.residual) / bandit.parameter
                     for bandit in self.bandit_collection
                 ],
             )
@@ -68,7 +68,7 @@ class Metrics:
                 ["best parameter hat",
                  round(self.bandit_collection.optimal_bandit.parameter_hat, 2)],
                  ["best parameter true",
-                 self.bandit_collection.optimal_bandit.true_parameter],
+                 self.bandit_collection.optimal_bandit.parameter],
                 ["total simulations", self.num_simulations],
                 ["total reward", self.total_reward],
                 ["mape", self.mape],
