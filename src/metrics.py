@@ -25,33 +25,42 @@ class Metrics:
     def num_simulations(self) -> int:
         return self.simulation.simulation_num
 
+    def _ae(self, residuals: list[float]) -> float:
+        return round(sum(map(abs, residuals)), self.rounding_dp)
+
     @property
-    def _ae(self) -> float:
-        return round(
-            sum([abs(bandit.residual) for bandit in self.bandit_collection]),
-            self.rounding_dp,
-        )
+    def ae(self) -> float:
+        return self._ae(residuals=[bandit.residual for bandit in self.bandit_collection])
+
+    def _mae(self, residuals: list[float]) -> float:
+        return round(self._ae(residuals) / len(self.bandit_collection), self.rounding_dp)
 
     @property
     def mae(self) -> float:
-        return round(self._ae / len(self.bandit_collection), self.rounding_dp)
+        return self._mae(residuals=[bandit.residual for bandit in self.bandit_collection])
 
-    @property
-    def total_reward(self) -> float:
-        return sum([bandit.reward for bandit in self.bandit_collection])
-
-    @property
-    def mape(self) -> float:
+    def _mape(self,
+              residuals: list[float],
+              parameters: list[float]) -> float:
         return round(
             sum(
                 [
-                    abs(bandit.residual) / bandit.parameter
-                    for bandit in self.bandit_collection
+                    abs(residuals[i]) / parameters[i]
+                    for i in range(len(self.bandit_collection))
                 ],
             )
             / len(self.bandit_collection),
             self.rounding_dp,
         )
+
+    @property
+    def mape(self) -> float:
+        return self._mape(residuals=[bandit.residual for bandit in self.bandit_collection],
+                          parameters=[bandit.parameter for bandit in self.bandit_collection])
+
+    @property
+    def total_reward(self) -> float:
+        return sum([bandit.reward for bandit in self.bandit_collection])
 
     def __str__(self) -> str:
         return tabulate(
@@ -169,3 +178,19 @@ class Metrics:
         self.residual_barplots()
         self.pull_residual_scatterplot()
         self.reward_timeseries_plot()
+
+
+@dataclass
+class OneParameterMetrics(Metrics):
+    """
+    Metrics for a simulation over bandits that are from a
+    one-parameter distribution.
+    """
+
+
+@dataclass
+class TwoParameterMetrics(Metrics):
+    """
+    Metrics for a simulation over bandits that are from a
+    two-parameter distribution.
+    """

@@ -10,9 +10,10 @@ from numpy.random import binomial
 @total_ordering
 class Bandit(ABC):
     """
-    Base class for a Bandit.
+    Base class for a bandit that is from the single-parameter
+    family of exponential distributions.
 
-    Note that bandits may follow different distributions (e.g) Bernoulli.
+    Examples may include Bernoulli or Poisson.
     """
     num_parameters = 1
 
@@ -70,6 +71,12 @@ class Bandit(ABC):
 
 
 class TwoParameterBandit(Bandit):
+    """
+    An extension for bandits that are from the two-parameter
+    family of exponential distributions.
+
+    Examples may include Gaussian.
+    """
     num_parameters = 2
 
     def __init__(self,
@@ -96,7 +103,9 @@ class TwoParameterBandit(Bandit):
 
 
 class BernoulliBandit(Bandit):
-    """Single bandit, simulating over a Bernoulli distribution."""
+    """
+    Single bandit, simulating over a Bernoulli distribution.
+    """
 
     def __init__(self,
                  parameter: float) -> None:
