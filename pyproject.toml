@@ -37,6 +37,7 @@
 ignore = [
     "COM812", 
     "ISC001",
+    "ANN003",
     "ANN101",
     "ANN102",
     "ANN204",
