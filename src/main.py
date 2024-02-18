@@ -103,18 +103,18 @@ def _validate_args(
                          "'epsilon_first'.")
 
     if distribution in Distribution.two_parameter_family and parameter_two_values is None: # noqa: E501
-        raise ValueError(f"Distribution {distribution.value} requires two"
-                         "parameters, rather than one. Please pass values for arg"
+        raise ValueError(f"Distribution {distribution.value} requires two "
+                         "parameters, rather than one. Please pass values for arg "
                          "'parameter_two_values'")
 
     if num_bandits != len(parameter_one_values):
-        raise ValueError("Length of parameter 'parameter_one_values' must be equal to"
-                         f"parameter 'num_bandits'. Got {len(parameter_one_values)}"
+        raise ValueError("Length of parameter 'parameter_one_values' must be equal to "
+                         f"parameter 'num_bandits'. Got {len(parameter_one_values)} "
                          f"and {num_bandits} respectively.")
 
-    if num_bandits is not None and num_simulations != len(parameter_two_values): # noqa: E501
-        raise ValueError("Length of parameter 'parameter_two_values' must be equal to"
-                         f"parameter 'num_bandits'. Got {len(parameter_two_values)}"
+    if distribution in Distribution.two_parameter_family and num_bandits != len(parameter_two_values): # noqa: E501
+        raise ValueError("Length of parameter 'parameter_two_values' must be equal to "
+                         f"parameter 'num_bandits'. Got {len(parameter_two_values)} "
                          f"and {num_bandits} respectively.")
 
 @app.command()
