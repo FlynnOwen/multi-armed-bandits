@@ -8,7 +8,6 @@ from typing import Any
 from numpy.random import binomial
 
 
-@dataclass
 class Bandit(ABC):
     """
     Base class for a Bandit.
@@ -16,8 +15,10 @@ class Bandit(ABC):
     Note that bandits may follow different distributions (e.g) Bernoulli.
     """
 
-    true_parameter: Any
-    _results: list[Any] = field(default_factory=list, init=False)
+    def __init__(self,
+                 true_parameter: float) -> None:
+        self.true_parameter = true_parameter
+        self._results: list[float] = []
 
     @abstractmethod
     def generate(self) -> None:
@@ -45,38 +46,31 @@ class Bandit(ABC):
         """
 
     @property
-    @abstractmethod
     def reward(self) -> float:
-        """
-        The total utility gained from this bandit.
-        """
+        return sum(self._results)
 
     def __len__(self) -> int:
         return len(self._results)
 
-    @abstractmethod
     def __eq__(self, value: float) -> bool:
-        pass
+        return self.parameter_hat == value
 
-    @abstractmethod
     def __lt__(self, value: float) -> bool:
-        pass
+        return self.parameter_hat < value
 
 
 @total_ordering
-@dataclass
 class BernoulliBandit(Bandit):
     """Single bandit, simulating over a Bernoulli distribution."""
 
-    true_parameter: float
-    _results: list[int] = field(default_factory=list, init=False)
-
-    def __post_init__(self):
-        if 0 > self.true_parameter < 1:
+    def __init__(self,
+                 true_parameter: float) -> None:
+        if 0 > true_parameter < 1:
             raise ValueError(
                 f"true_parameter must be 0 <= true_parameter <= 1"
-                f"got value {self.true_parameter} instead."
+                f"got value {true_parameter} instead."
             )
+        super().__init__(true_parameter)
 
     def generate(self) -> float:
         """
@@ -105,16 +99,6 @@ class BernoulliBandit(Bandit):
         bandit and the estimated parameter.
         """
         return self.true_parameter - self.parameter_hat
-
-    @property
-    def reward(self) -> float:
-        return sum(self._results)
-
-    def __eq__(self, value: float) -> bool:
-        return self.parameter_hat == value
-
-    def __lt__(self, value: float) -> bool:
-        return self.parameter_hat < value
 
 
 @dataclass

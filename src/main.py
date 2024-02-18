@@ -75,8 +75,8 @@ def main(
     sel_strategy = strategy_factory(strategy=strategy,
                                     bandit_collection=bandit_collection,
                                     num_simulations=num_simulations,
-                                    epsilon=epsilon)
-                                    #decay_rate=decay_rate)
+                                    epsilon=epsilon,
+                                    decay_rate=decay_rate)  #HACK: This parameter should only be passed to some strategies. # noqa: E501
 
     sel_strategy.full_simulation()
     metrics = Metrics(sel_strategy)
@@ -90,11 +90,10 @@ def _validate_args(
         num_bandits: int,
         strategy: Strategy,
         distribution: Distribution,
-        num_simulations: int,
         decay_rate: float,
         parameter_one_values: list[float],
         parameter_two_values: list[float]
-        ):
+        ) -> None:
     """
     Validate complex arguments pass to simulate().
     """
@@ -138,7 +137,6 @@ def simulate(
         num_bandits=num_bandits,
         strategy=strategy,
         distribution=distribution,
-        num_simulations=num_simulations,
         decay_rate=decay_rate,
         parameter_one_values=parameter_one_values,
         parameter_two_values=parameter_two_values
@@ -165,7 +163,7 @@ def simulate_from_json(config: Path) -> None:
     TODO: Create example json schema.
     """
     if not config.is_file() and config.suffix != ".json":
-        raise ValueError("config must be a file with .json suffix")
+        raise ValueError("config must be suffixed with '.json'.")
     simulation_args = json.load(config)
     simulate(**simulation_args)
 

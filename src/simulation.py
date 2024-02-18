@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from random import uniform
-from typing import Any
 
 from src.bandit import Bandit, BanditCollection
 from src.utils.utils import ucb
@@ -23,7 +22,6 @@ class Simulation:
         self.strategy.full_simulation(self.bandit_collection)
 
 
-@dataclass
 class SemiUniformStrategy(ABC):
     """
     Implements the strategy pattern for 'Semi-Uniform' strategies
@@ -33,17 +31,20 @@ class SemiUniformStrategy(ABC):
     strategies discovered to approximately solve the bandit problem.
     """
 
-    bandit_collection: BanditCollection
-    num_simulations: int
-    epsilon: float
-    results: list[Any] = field(default_factory=list, init=False)
-
-    def __post_init__(self):
-        if 0 > self.epsilon < 1:
+    def __init__(self,
+                 bandit_collection: BanditCollection,
+                 num_simulations: int,
+                 epsilon: float = 0.2,
+                 **kwargs):
+        if 0 > epsilon < 1:
             raise ValueError(
                 f"epsilon must be 0 <= epsilon <= 1"
-                f"got value {self.epsilon} instead."
+                f"got value {epsilon} instead."
             )
+        self.bandit_collection = bandit_collection
+        self.num_simulations = num_simulations
+        self.epsilon = epsilon
+        self.results: list[float] = []
 
     @property
     def simulation_num(self) -> int:
@@ -79,15 +80,14 @@ class SemiUniformStrategy(ABC):
         return self.bandit_collection
 
 
-@dataclass
 class EpsilonGreedyStrategy(SemiUniformStrategy):
     """
     The best lever is selected for 1-epsilon of the trials,
     and a lever is selected at (Uniform) random for a proportion
     epsilon.
-    """
 
-    epsilon: float = 0.2
+    Epsilon is suggested to be higher (~0.8) for this strategy.
+    """
 
     def _bandit_strategy(self, random_value: float) -> Bandit:
         """
@@ -107,7 +107,6 @@ class EpsilonGreedyStrategy(SemiUniformStrategy):
         self.results.append(result)
 
 
-@dataclass
 class EpsilonDecreasingStrategy(SemiUniformStrategy):
     """
     Similar to EpsilonGreegyStrategy, but epsilon gradually decreases.
@@ -125,12 +124,19 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
     and epsilon, all parameters should be kept in mind during selection.
     """
 
-    epsilon: float = 0.8
-    decay_rate: float = 0.05
-
-    def __post_init__(self):
+    def __init__(self,
+                 bandit_collection: BanditCollection,
+                 num_simulations: int,
+                 epsilon: float = 0.8,
+                 decay_rate: float = 0.05,
+                 **kwargs):
         if 0 < self.decay_rate < 1:
             raise ValueError("parameter decay_rate must be 0 < decay_rate < 1.")
+        super().__init__(bandit_collection,
+                         num_simulations,
+                         epsilon,
+                         **kwargs)
+        self.decay_rate = decay_rate
 
     @property
     def epsilon_curr(self) -> float:
@@ -159,15 +165,12 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
         self.results.append(result)
 
 
-@dataclass
 class EpsilonFirstStrategy(SemiUniformStrategy):
     """
     A pure exploration phase occurs for epsilon * num_simulations trials,
     followed by a pure exploitation phase for (1 - epsilon) * num_simulations
     trials.
     """
-
-    epsilon: float = 0.8
 
     @property
     def exploitation_phase(self) -> bool:
@@ -186,15 +189,15 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
         self.results.append(result)
 
 
-@dataclass
 class UCBSimulation(Simulation):
     """
     Simulation incorporating the Upper Confidence Bound (UCB).
 
     NOTE: This is incomplete
     """
-
-    exploitation_constant: float = 0.5
+    def __init__(self,
+                 exploitation_constant: float = 0.5) -> None:
+        self.exploitation_constant = exploitation_constant
 
     def _ucb(self) -> float:
         """
