@@ -22,12 +22,12 @@ class Distribution(str, Enum):
     gaussian = "gaussian"
 
 
-def distribution_factory(distribution: Distribution, **kwargs) -> Bandit:  # noqa: ANN003
+def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
     distribution_map = {
         Distribution.bernoulli: BernoulliBandit,
     }
 
-    return distribution_map[distribution](**kwargs)
+    return distribution_map[distribution]
 
 
 class Strategy(str, Enum):
@@ -53,59 +53,69 @@ def main(
     num_bandits: int,
     print_metrics: bool,
     print_plots: bool,
-    parameter_one_mean: float,
-    parameter_two_mean: float,
     epsilon: float,
     decay_rate: float,
     parameter_one_values: list[float],
     parameter_two_values: list[float],
 ) -> None:
     sel_distribution = distribution_factory(distribution=distirbution)
-    if parameter_one_values is None:
-        # Generate bandits according to distribution
-        pass
-    else:
-        # Generate bandits using defined values
-        pass
-    if parameter_two_values is None:
-        # Generate bandits according to distribution
-        pass
-    else:
-        # Generate bandits using defined values
-        pass
 
-    # TODO: Find out how to pass decay_rate
-    sel_strategy = strategy_factory(bandit_collection=...,
-                                    strategy=strategy,
-                                    epsilon=epsilon,
-                                    num_simulations=num_simulations)
+    bandit_collection = BanditCollection([sel_distribution(true_parameter=value)
+                                          for value in parameter_one_values])
+    sel_strategy = strategy_factory(strategy=strategy,
+                                    bandit_collection=bandit_collection,
+                                    num_simulations=num_simulations,
+                                    epsilon=epsilon)
+                                    #decay_rate=decay_rate)
+
     sel_strategy.full_simulation()
-    metrics = Metrics(...)
+    metrics = Metrics(sel_strategy)
 
     if print_plots:
         metrics.generate_plots()
     if print_metrics:
         print(metrics)  #noqa: T201
 
+def _validate_args(
+        num_bandits: int,
+        strategy: Strategy,
+        distribution: Distribution,
+        decay_rate: float,
+        parameter_one_values: list[float],
+        parameter_two_values: list[float]
+        ):
+    """
+    Validate complex arguments pass to simulate().
+    """
+    pass
+
 @app.command()
 def simulate(
     strategy: Strategy = Strategy.epsilon_greedy.value,
-    distirbution: Distribution = Distribution.bernoulli.value,
+    distribution: Distribution = Distribution.bernoulli.value,
     num_simulations: Annotated[int, typer.Option(min=10)] = 500,
     num_bandits: Annotated[int, typer.Option(min=2)] = 10,
     print_metrics: bool = False,
     print_plots: bool = False,
-    parameter_one_mean: float = 0.5,
-    parameter_two_mean: float = None,
     epsilon: float = 0.2,
     decay_rate: float = 0.05,
-    parameter_one_values: list[float] = None,
+    parameter_one_values: list[float] = [0.1, 0.1, 0.1, 0.1, 0.1,
+                                         0.1, 0.1, 0.1 ,0.1 ,0.5],
     parameter_two_values: list[float] = None,
 ) -> None:  # noqa: ANN003
     """
     Runs a multi-armed bandit simulation.
     """
-    pass  # noqa: PIE790
+    main(strategy=strategy,
+         distirbution=distribution,
+         num_simulations=num_simulations,
+         num_bandits=num_bandits,
+         print_metrics=print_metrics,
+         print_plots=print_plots,
+         epsilon=epsilon,
+         decay_rate=decay_rate,
+         parameter_one_values=parameter_one_values,
+         parameter_two_values=parameter_two_values)
 
 
 @app.command()

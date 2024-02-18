@@ -65,6 +65,10 @@ class Metrics:
     def __str__(self) -> str:
         return tabulate(
             [
+                ["best parameter hat",
+                 round(self.bandit_collection.optimal_bandit.parameter_hat, 2)],
+                 ["best parameter true",
+                 self.bandit_collection.optimal_bandit.true_parameter],
                 ["total simulations", self.num_simulations],
                 ["total reward", self.total_reward],
                 ["mape", self.mape],
