@@ -59,7 +59,7 @@ class Metrics:
             (
                 np.cumsum(self.simulation.results)
                 / np.arange(1, self.num_simulations + 1)
-            ).round(2)
+            ).round(self.rounding_dp)
         )
 
     def __str__(self) -> str:
