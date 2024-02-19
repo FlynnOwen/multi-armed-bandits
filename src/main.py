@@ -5,8 +5,13 @@ from typing import Annotated
 
 import typer
 
-from src.bandit import Bandit, BanditCollection, BernoulliBandit  # noqa: F401
-from src.metrics import Metrics  # noqa: F401
+from src.bandit import (
+    Bandit, 
+    BanditCollection, 
+    BernoulliBandit,
+    GaussianBandit
+)
+from src.metrics import Metrics
 from src.simulation import (
     EpsilonDecreasingStrategy,
     EpsilonFirstStrategy,
@@ -35,6 +40,7 @@ class Distribution(str, Enum):
 def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
     distribution_map = {
         Distribution.bernoulli: BernoulliBandit,
+        Distribution.gaussian: GaussianBandit,
     }
 
     return distribution_map[distribution]

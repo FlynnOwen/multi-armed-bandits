@@ -4,7 +4,7 @@ from functools import total_ordering
 from math import inf
 from random import choice
 
-from numpy.random import binomial
+from numpy.random import binomial, normal
 
 
 @total_ordering
@@ -51,8 +51,8 @@ class Bandit(ABC):
     @property
     def residual(self) -> float:
         """
-        Residual between the true primary parameter
-        and the estimated primary parameter.
+        The difference between the true parameter of an armed
+        bandit and the estimated parameter.
         """
         return self._residual(self.parameter, self.parameter_hat)
 
@@ -129,20 +129,54 @@ class BernoulliBandit(Bandit):
     @property
     def parameter_hat(self) -> float:
         """
-        The estimated parameter for this bandit.
-        Note that the Maximum Likelihood estimator is used.
+        The estimated theta for this bandit.
+        """
+        if not self._results:
+            return inf
+        return sum(self._results) / len(self._results)
+
+
+class GaussianBandit(TwoParameterBandit):
+    """
+    Single bandit, simulating over a Gaussian distribution.
+    """
+    def __init__(self,
+                 parameter: float,
+                 secondary_parameter: float) -> None:
+        if secondary_parameter < 0:
+            raise ValueError(
+                "secondary_parameter must be < 0"
+                f"got value {secondary_parameter} instead."
+            )
+        super().__init__(parameter, secondary_parameter)
+
+    def generate(self) -> float:
+        """
+        Generates a single result from the pull of the
+        armed bandit.
+        """
+        result = normal(loc=self.parameter, scale=self.secondary_parameter, size=1)
+        self._results.append(result)
+
+        return result
+
+    @property
+    def parameter_hat(self) -> float:
+        """
+        The estimated mean for this bandit.
         """
         if not self._results:
             return inf
         return sum(self._results) / len(self._results)
 
     @property
-    def residual(self) -> float:
+    def secondary_parameter_hat(self) -> float:
         """
-        The difference between the true parameter of an armed
-        bandit and the estimated parameter.
+        The estimated variance for this bandit.
         """
-        return self.parameter - self.parameter_hat
+        sum([result - self.parameter_hat for result in self._results]) \
+            / len(self._results)
+
 
 
 @dataclass

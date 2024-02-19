@@ -3,7 +3,7 @@ from random import random
 import pytest
 
 from src.bandit import BanditCollection, BernoulliBandit
-from src.metrics import Metrics, OneParameterMetrics
+from src.metrics import OneParameterMetrics
 from src.simulation import EpsilonGreedyStrategy
 
 
