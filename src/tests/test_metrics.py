@@ -3,7 +3,7 @@ from random import random
 import pytest
 
 from src.bandit import BanditCollection, BernoulliBandit
-from src.metrics import Metrics
+from src.metrics import Metrics, OneParameterMetrics
 from src.simulation import EpsilonGreedyStrategy
 
 
@@ -25,18 +25,17 @@ def metrics(bandit_collection: BanditCollection):
         epsilon=0.2,
     )
     simulation.full_simulation()
-    return Metrics(simulation)
+    return OneParameterMetrics(simulation)
 
 
-def test_metrics_num_simulations(metrics: Metrics):
+def test_metrics_num_simulations(metrics: OneParameterMetrics):
     assert metrics.num_simulations == 50
 
 
-def test_metrics_errors(metrics: Metrics):
-    assert 0 <= metrics._ae <= 10
+def test_metrics_errors(metrics: OneParameterMetrics):
     assert 0 <= metrics.mae <= 1
     assert metrics.mape >= 0
 
 
-def test_metrics_rewards(metrics: Metrics):
+def test_metrics_rewards(metrics: OneParameterMetrics):
     assert 0 <= metrics.total_reward <= 50
