@@ -65,8 +65,8 @@ class SemiUniformStrategy(ABC):
         if self.simulation_num >= self.num_simulations:
             raise Exception(
                 f"There have already been {self.simulation_num} simulations"
-                f"Consdier using simulate(desired_number) for "
-                f"executing more simulations."
+                "Consdier using simulate(desired_number) for "
+                "executing more simulations."
             )
         [self.simulate_one() for _ in range(self.simulation_num, self.num_simulations)]
         return self.bandit_collection
