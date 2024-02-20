@@ -18,7 +18,9 @@ class Bandit(ABC):
 
     num_parameters = 1
 
-    def __init__(self, parameter: float) -> None:
+    def __init__(self,
+                 parameter: float,
+                 **kwargs) -> None:
         self.parameter = parameter
         self._results: list[float] = []
 
@@ -78,7 +80,10 @@ class TwoParameterBandit(Bandit, ABC):
 
     num_parameters = 2
 
-    def __init__(self, parameter: float, secondary_parameter: float) -> None:
+    def __init__(self,
+                 parameter: float,
+                 secondary_parameter: float,
+                 **kwargs) -> None:
         super().__init__(parameter)
         self.secondary_parameter = secondary_parameter
 
@@ -103,7 +108,9 @@ class BernoulliBandit(Bandit):
     Single bandit, simulating over a Bernoulli distribution.
     """
 
-    def __init__(self, parameter: float) -> None:
+    def __init__(self,
+                 parameter: float,
+                 **kwargs) -> None:
         if 0 > parameter < 1:
             raise ValueError(
                 f"parameter must be 0 <= parameter <= 1"
@@ -136,7 +143,10 @@ class GaussianBandit(TwoParameterBandit):
     Single bandit, simulating over a Gaussian distribution.
     """
 
-    def __init__(self, parameter: float, secondary_parameter: float) -> None:
+    def __init__(self,
+                 parameter: float,
+                 secondary_parameter: float,
+                 **kwargs) -> None:
         if secondary_parameter < 0:
             raise ValueError(
                 "secondary_parameter must be < 0"
@@ -181,6 +191,12 @@ class BanditCollection:
 
     bandits: list[Bandit]
     results: list[int] = field(default_factory=list)
+
+    def from_parameter_list(cls): #noqa
+        """
+        Constructor using list(s) of parameters and bandit types.
+        """
+        return cls(...)
 
     def __post_init__(self):
         self.num_parameters = self.random_bandit.num_parameters

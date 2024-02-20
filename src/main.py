@@ -71,15 +71,15 @@ def main(
     sel_distribution = distribution_factory(distribution=distirbution)
 
     bandit_collection = BanditCollection(
-        [sel_distribution(parameter=value) for value in parameter_one_values]
+        [sel_distribution(parameter=parameter_one_values[i], secondary_parameter=parameter_two_values[i]) for i in range(num_bandits)]
     )
     simulation = strategy_factory(
         strategy=strategy,
         bandit_collection=bandit_collection,
         num_simulations=num_simulations,
         epsilon=epsilon,
-        decay_rate=decay_rate,
-    )  # HACK: This parameter should only be passed to some strategies. # noqa: E501
+        decay_rate=decay_rate, # HACK: This parameter should only be passed to some strategies. # noqa: E501
+    )
 
     simulation.full_simulation()
 
