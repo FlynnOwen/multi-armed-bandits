@@ -25,7 +25,7 @@ def metrics(bandit_collection: BanditCollection):
         epsilon=0.2,
     )
     simulation.full_simulation()
-    return OneParameterMetrics(simulation)
+    return OneParameterMetrics(simulation.bandit_collection)
 
 
 def test_metrics_num_simulations(metrics: OneParameterMetrics):

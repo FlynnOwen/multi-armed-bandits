@@ -7,7 +7,7 @@ import pandas as pd
 import seaborn as sns
 from tabulate import tabulate
 
-from src.simulation import SemiUniformStrategy
+from src.bandit import BanditCollection
 
 
 @dataclass
@@ -16,15 +16,22 @@ class Metrics(ABC):
     Encapsulates metrics of bandits.
     """
 
-    simulation: SemiUniformStrategy
+    bandit_collection: BanditCollection
     rounding_dp: int = 2
 
-    def __post_init__(self):
-        self.bandit_collection = self.simulation.bandit_collection
+    @property
+    @abstractmethod
+    def num_parameters(self) -> int:
+        pass
+
+    def __post_init__(cls): #noqa N801
+        if cls.num_parameters != cls.bandit_collection.num_parameters:
+            raise ValueError(f"You may only utilize bandits with"
+                             f" {cls.num_parameters} to this class.")
 
     @property
     def num_simulations(self) -> int:
-        return self.simulation.simulation_num
+        return self.bandit_collection.simulation_num
 
     def _ae(self, residuals: list[float]) -> float:
         return round(sum(map(abs, residuals)), self.rounding_dp)
@@ -129,6 +136,7 @@ class OneParameterMetrics(Metrics):
     Metrics for a simulation over bandits that are from a
     one-parameter distribution.
     """
+    num_parameters = 1
 
     def __str__(self) -> str:
         return tabulate(
@@ -209,6 +217,7 @@ class TwoParameterMetrics(Metrics):
     Metrics for a simulation over bandits that are from a
     two-parameter distribution.
     """
+    num_parameters = 2
 
     @property
     def secondary_mae(self) -> float:

@@ -70,7 +70,7 @@ class Bandit(ABC):
         return self.parameter_hat < value
 
 
-class TwoParameterBandit(Bandit):
+class TwoParameterBandit(Bandit, ABC):
     """
     An extension for bandits that are from the two-parameter
     family of exponential distributions.

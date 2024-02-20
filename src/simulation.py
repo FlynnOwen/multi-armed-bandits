@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from random import uniform
 
 from src.bandit import Bandit, BanditCollection
+from src.metrics import Metrics
 from src.utils.utils import ucb
 
 
@@ -45,6 +46,13 @@ class SemiUniformStrategy(ABC):
         self.num_simulations = num_simulations
         self.epsilon = epsilon
         self.results: list[float] = []
+
+    @property
+    def metrics(self):
+        """
+        FIXME
+        """
+        return Metrics(self.bandit_collection)
 
     @property
     def simulation_num(self) -> int:
