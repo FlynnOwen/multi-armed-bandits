@@ -15,7 +15,6 @@ class Bandit(ABC):
 
     Examples may include Bernoulli or Poisson.
     """
-
     num_parameters = 1
 
     def __init__(self,
@@ -77,7 +76,6 @@ class TwoParameterBandit(Bandit, ABC):
 
     Examples may include Gaussian.
     """
-
     num_parameters = 2
 
     def __init__(self,
@@ -192,9 +190,12 @@ class BanditCollection:
     bandits: list[Bandit]
     results: list[int] = field(default_factory=list)
 
-    def from_parameter_list(cls): #noqa
+    def from_parameter_list(cls,  #noqa
+                            bandit_type: str,
+                            parameter_one_values: list[float],
+                            **kwargs): #noqa
         """
-        Constructor using list(s) of parameters and bandit types.
+        Constructor using list(s) of parameters and a bandit type.
         """
         return cls(...)
 
