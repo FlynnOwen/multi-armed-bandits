@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import total_ordering
 from math import inf
 from random import choice
@@ -186,6 +186,7 @@ class BanditCollection:
     """
 
     bandits: list[Bandit]
+    results: list[int] = field(default_factory=list)
 
     def __post_init__(self):
         self.num_parameters = self.random_bandit.num_parameters

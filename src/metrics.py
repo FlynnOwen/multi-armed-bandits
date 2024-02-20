@@ -27,7 +27,8 @@ class Metrics(ABC):
     def __post_init__(cls): #noqa N801
         if cls.num_parameters != cls.bandit_collection.num_parameters:
             raise ValueError(f"You may only utilize bandits with"
-                             f" {cls.num_parameters} to this class.")
+                             f" {cls.num_parameters} to this class."
+                             f" Got {cls.bandit_collection.num_parameters} instead.")
 
     @property
     def num_simulations(self) -> int:
@@ -74,7 +75,7 @@ class Metrics(ABC):
     def average_reward_timeseries(self) -> list[float]:
         return list(
             (
-                np.cumsum(self.simulation.results)
+                np.cumsum(self.bandit_collection.results)
                 / np.arange(1, self.num_simulations + 1)
             ).round(self.rounding_dp)
         )

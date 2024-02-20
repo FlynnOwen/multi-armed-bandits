@@ -78,19 +78,18 @@ def main(
 
     bandit_collection = BanditCollection([sel_distribution(parameter=value)
                                           for value in parameter_one_values])
-    sel_strategy = strategy_factory(strategy=strategy,
+    simulation = strategy_factory(strategy=strategy,
                                     bandit_collection=bandit_collection,
                                     num_simulations=num_simulations,
                                     epsilon=epsilon,
                                     decay_rate=decay_rate)  #HACK: This parameter should only be passed to some strategies. # noqa: E501
 
-    sel_strategy.full_simulation()
-    metrics = Metrics(sel_strategy)
+    simulation.full_simulation()
 
     if print_plots:
-        metrics.generate_plots()
+        simulation.metrics.generate_plots()
     if print_metrics:
-        print(metrics)  #noqa: T201
+        print(simulation.metrics)  #noqa: T201
 
 def _validate_args(
         num_bandits: int,
