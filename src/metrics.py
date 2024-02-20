@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,11 +24,13 @@ class Metrics(ABC):
     def num_parameters(self) -> int:
         pass
 
-    def __post_init__(cls): #noqa N801
+    def __post_init__(cls):  # noqa N801
         if cls.num_parameters != cls.bandit_collection.num_parameters:
-            raise ValueError(f"You may only utilize bandits with"
-                             f" {cls.num_parameters} to this class."
-                             f" Got {cls.bandit_collection.num_parameters} instead.")
+            raise ValueError(
+                f"You may only utilize bandits with"
+                f" {cls.num_parameters} to this class."
+                f" Got {cls.bandit_collection.num_parameters} instead."
+            )
 
     @property
     def num_simulations(self) -> int:
@@ -38,15 +40,17 @@ class Metrics(ABC):
         return round(sum(map(abs, residuals)), self.rounding_dp)
 
     def _mae(self, residuals: list[float]) -> float:
-        return round(self._ae(residuals) / len(self.bandit_collection), self.rounding_dp)
+        return round(
+            self._ae(residuals) / len(self.bandit_collection), self.rounding_dp
+        )
 
     @property
     def mae(self) -> float:
-        return self._mae(residuals=[bandit.residual for bandit in self.bandit_collection])
+        return self._mae(
+            residuals=[bandit.residual for bandit in self.bandit_collection]
+        )
 
-    def _mape(self,
-              residuals: list[float],
-              parameters: list[float]) -> float:
+    def _mape(self, residuals: list[float], parameters: list[float]) -> float:
         return round(
             sum(
                 [
@@ -60,8 +64,10 @@ class Metrics(ABC):
 
     @property
     def mape(self) -> float:
-        return self._mape(residuals=[bandit.residual for bandit in self.bandit_collection],
-                          parameters=[bandit.parameter for bandit in self.bandit_collection])
+        return self._mape(
+            residuals=[bandit.residual for bandit in self.bandit_collection],
+            parameters=[bandit.parameter for bandit in self.bandit_collection],
+        )
 
     @property
     def total_reward(self) -> float:
@@ -137,16 +143,23 @@ class OneParameterMetrics(Metrics):
     Metrics for a simulation over bandits that are from a
     one-parameter distribution.
     """
+
     num_parameters = 1
 
     def __str__(self) -> str:
         return tabulate(
             [
-                ["optimal bandit parameter true",
-                    self.bandit_collection.optimal_bandit.parameter],
-                ["optimal bandit parameter hat",
-                    round(self.bandit_collection.optimal_bandit.parameter_hat,
-                        self.rounding_dp)],
+                [
+                    "optimal bandit parameter true",
+                    self.bandit_collection.optimal_bandit.parameter,
+                ],
+                [
+                    "optimal bandit parameter hat",
+                    round(
+                        self.bandit_collection.optimal_bandit.parameter_hat,
+                        self.rounding_dp,
+                    ),
+                ],
                 ["total simulations", self.num_simulations],
                 ["total reward", self.total_reward],
                 ["mape", self.mape],
@@ -218,30 +231,47 @@ class TwoParameterMetrics(Metrics):
     Metrics for a simulation over bandits that are from a
     two-parameter distribution.
     """
+
     num_parameters = 2
 
     @property
     def secondary_mae(self) -> float:
-        return self._mae(residuals=[bandit.residual for bandit in self.bandit_collection])
+        return self._mae(
+            residuals=[bandit.residual for bandit in self.bandit_collection]
+        )
 
     @property
     def secondary_mape(self) -> float:
-        return self._mape(residuals=[bandit.residual for bandit in self.bandit_collection],
-                          parameters=[bandit.parameter for bandit in self.bandit_collection])
+        return self._mape(
+            residuals=[bandit.residual for bandit in self.bandit_collection],
+            parameters=[bandit.parameter for bandit in self.bandit_collection],
+        )
 
     def __str__(self) -> str:
         return tabulate(
             [
-                ["optimal bandit parameter true",
-                 self.bandit_collection.optimal_bandit.parameter],
-                ["optimal bandit secondary parameter true",
-                 self.bandit_collection.optimal_bandit.secondary_parameter],
-                ["optimal bandit parameter hat",
-                 round(self.bandit_collection.optimal_bandit.parameter_hat,
-                       self.rounding_dp)],
-                ["optimal bandit secondary parameter hat",
-                 round(self.bandit_collection.optimal_bandit.secondary_parameter_hat,
-                       self.rounding_dp)],
+                [
+                    "optimal bandit parameter true",
+                    self.bandit_collection.optimal_bandit.parameter,
+                ],
+                [
+                    "optimal bandit secondary parameter true",
+                    self.bandit_collection.optimal_bandit.secondary_parameter,
+                ],
+                [
+                    "optimal bandit parameter hat",
+                    round(
+                        self.bandit_collection.optimal_bandit.parameter_hat,
+                        self.rounding_dp,
+                    ),
+                ],
+                [
+                    "optimal bandit secondary parameter hat",
+                    round(
+                        self.bandit_collection.optimal_bandit.secondary_parameter_hat,
+                        self.rounding_dp,
+                    ),
+                ],
                 ["total simulations", self.num_simulations],
                 ["total reward", self.total_reward],
                 ["mape", self.mape],

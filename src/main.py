@@ -5,13 +5,7 @@ from typing import Annotated
 
 import typer
 
-from src.bandit import (
-    Bandit, 
-    BanditCollection, 
-    BernoulliBandit,
-    GaussianBandit
-)
-from src.metrics import Metrics
+from src.bandit import Bandit, BanditCollection, BernoulliBandit, GaussianBandit
 from src.simulation import (
     EpsilonDecreasingStrategy,
     EpsilonFirstStrategy,
@@ -28,12 +22,12 @@ class Distribution(str, Enum):
 
     @classmethod
     @property
-    def one_parameter_family(cls): #noqa: ANN206
+    def one_parameter_family(cls):  # noqa: ANN206
         return {cls.bernoulli}
 
     @classmethod
     @property
-    def two_parameter_family(cls): #noqa: ANN206
+    def two_parameter_family(cls):  # noqa: ANN206
         return {cls.gaussian}
 
 
@@ -76,50 +70,67 @@ def main(
 ) -> None:
     sel_distribution = distribution_factory(distribution=distirbution)
 
-    bandit_collection = BanditCollection([sel_distribution(parameter=value)
-                                          for value in parameter_one_values])
-    simulation = strategy_factory(strategy=strategy,
-                                    bandit_collection=bandit_collection,
-                                    num_simulations=num_simulations,
-                                    epsilon=epsilon,
-                                    decay_rate=decay_rate)  #HACK: This parameter should only be passed to some strategies. # noqa: E501
+    bandit_collection = BanditCollection(
+        [sel_distribution(parameter=value) for value in parameter_one_values]
+    )
+    simulation = strategy_factory(
+        strategy=strategy,
+        bandit_collection=bandit_collection,
+        num_simulations=num_simulations,
+        epsilon=epsilon,
+        decay_rate=decay_rate,
+    )  # HACK: This parameter should only be passed to some strategies. # noqa: E501
 
     simulation.full_simulation()
 
     if print_plots:
         simulation.metrics.generate_plots()
     if print_metrics:
-        print(simulation.metrics)  #noqa: T201
+        print(simulation.metrics)  # noqa: T201
+
 
 def _validate_args(
-        num_bandits: int,
-        strategy: Strategy,
-        distribution: Distribution,
-        decay_rate: float,
-        parameter_one_values: list[float],
-        parameter_two_values: list[float]
-        ) -> None:
+    num_bandits: int,
+    strategy: Strategy,
+    distribution: Distribution,
+    decay_rate: float,
+    parameter_one_values: list[float],
+    parameter_two_values: list[float],
+) -> None:
     """
     Validate complex arguments pass to simulate().
     """
     if strategy == Strategy.epsilon_decreasing and decay_rate is None:
-        raise ValueError("Arg 'decay_rate' must be passed if using strategy"
-                         "'epsilon_first'.")
+        raise ValueError(
+            "Arg 'decay_rate' must be passed if using strategy" "'epsilon_first'."
+        )
 
-    if distribution in Distribution.two_parameter_family and parameter_two_values is None: # noqa: E501
-        raise ValueError(f"Distribution {distribution.value} requires two "
-                         "parameters, rather than one. Please pass values for arg "
-                         "'parameter_two_values'")
+    if (
+        distribution in Distribution.two_parameter_family
+        and parameter_two_values is None
+    ):  # noqa: E501
+        raise ValueError(
+            f"Distribution {distribution.value} requires two "
+            "parameters, rather than one. Please pass values for arg "
+            "'parameter_two_values'"
+        )
 
     if num_bandits != len(parameter_one_values):
-        raise ValueError("Length of parameter 'parameter_one_values' must be equal to "
-                         f"parameter 'num_bandits'. Got {len(parameter_one_values)} "
-                         f"and {num_bandits} respectively.")
+        raise ValueError(
+            "Length of parameter 'parameter_one_values' must be equal to "
+            f"parameter 'num_bandits'. Got {len(parameter_one_values)} "
+            f"and {num_bandits} respectively."
+        )
 
-    if distribution in Distribution.two_parameter_family and num_bandits != len(parameter_two_values): # noqa: E501
-        raise ValueError("Length of parameter 'parameter_two_values' must be equal to "
-                         f"parameter 'num_bandits'. Got {len(parameter_two_values)} "
-                         f"and {num_bandits} respectively.")
+    if distribution in Distribution.two_parameter_family and num_bandits != len(
+        parameter_two_values
+    ):  # noqa: E501
+        raise ValueError(
+            "Length of parameter 'parameter_two_values' must be equal to "
+            f"parameter 'num_bandits'. Got {len(parameter_two_values)} "
+            f"and {num_bandits} respectively."
+        )
+
 
 @app.command()
 def simulate(
@@ -131,8 +142,18 @@ def simulate(
     print_plots: bool = False,
     epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
     decay_rate: float = 0.05,
-    parameter_one_values: list[float] = [0.1, 0.1, 0.1, 0.1, 0.1,
-                                         0.1, 0.1, 0.1 ,0.1 ,0.5],
+    parameter_one_values: list[float] = [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.5,
+    ],
     parameter_two_values: list[float] = None,
 ) -> None:  # noqa: ANN003
     """
@@ -144,18 +165,20 @@ def simulate(
         distribution=distribution,
         decay_rate=decay_rate,
         parameter_one_values=parameter_one_values,
-        parameter_two_values=parameter_two_values
+        parameter_two_values=parameter_two_values,
     )
-    main(strategy=strategy,
-         distirbution=distribution,
-         num_simulations=num_simulations,
-         num_bandits=num_bandits,
-         print_metrics=print_metrics,
-         print_plots=print_plots,
-         epsilon=epsilon,
-         decay_rate=decay_rate,
-         parameter_one_values=parameter_one_values,
-         parameter_two_values=parameter_two_values)
+    main(
+        strategy=strategy,
+        distirbution=distribution,
+        num_simulations=num_simulations,
+        num_bandits=num_bandits,
+        print_metrics=print_metrics,
+        print_plots=print_plots,
+        epsilon=epsilon,
+        decay_rate=decay_rate,
+        parameter_one_values=parameter_one_values,
+        parameter_two_values=parameter_two_values,
+    )
 
 
 @app.command()

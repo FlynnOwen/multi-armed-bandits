@@ -6,10 +6,7 @@ from dataclasses import dataclass
 from random import uniform
 
 from src.bandit import Bandit, BanditCollection
-from src.metrics import (
-    OneParameterMetrics, 
-    TwoParameterMetrics
-)
+from src.metrics import OneParameterMetrics, TwoParameterMetrics
 from src.utils.utils import ucb
 
 
@@ -35,15 +32,16 @@ class SemiUniformStrategy(ABC):
     strategies discovered to approximately solve the bandit problem.
     """
 
-    def __init__(self,
-                 bandit_collection: BanditCollection,
-                 num_simulations: int,
-                 epsilon: float = 0.2,
-                 **kwargs):
+    def __init__(
+        self,
+        bandit_collection: BanditCollection,
+        num_simulations: int,
+        epsilon: float = 0.2,
+        **kwargs,
+    ):
         if 0 > epsilon < 1:
             raise ValueError(
-                f"epsilon must be 0 <= epsilon <= 1"
-                f"got value {epsilon} instead."
+                f"epsilon must be 0 <= epsilon <= 1" f"got value {epsilon} instead."
             )
         self.bandit_collection = bandit_collection
         self.num_simulations = num_simulations
@@ -133,18 +131,17 @@ class EpsilonDecreasingStrategy(SemiUniformStrategy):
     and epsilon, all parameters should be kept in mind during selection.
     """
 
-    def __init__(self,
-                 bandit_collection: BanditCollection,
-                 num_simulations: int,
-                 epsilon: float = 0.8,
-                 decay_rate: float = 0.05,
-                 **kwargs):
+    def __init__(
+        self,
+        bandit_collection: BanditCollection,
+        num_simulations: int,
+        epsilon: float = 0.8,
+        decay_rate: float = 0.05,
+        **kwargs,
+    ):
         if 0 < self.decay_rate < 1:
             raise ValueError("parameter decay_rate must be 0 < decay_rate < 1.")
-        super().__init__(bandit_collection,
-                         num_simulations,
-                         epsilon,
-                         **kwargs)
+        super().__init__(bandit_collection, num_simulations, epsilon, **kwargs)
         self.decay_rate = decay_rate
 
     @property
@@ -204,8 +201,8 @@ class UCBSimulation(Simulation):
 
     NOTE: This is incomplete
     """
-    def __init__(self,
-                 exploitation_constant: float = 0.5) -> None:
+
+    def __init__(self, exploitation_constant: float = 0.5) -> None:
         self.exploitation_constant = exploitation_constant
 
     def _ucb(self) -> float:

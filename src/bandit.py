@@ -15,10 +15,10 @@ class Bandit(ABC):
 
     Examples may include Bernoulli or Poisson.
     """
+
     num_parameters = 1
 
-    def __init__(self,
-                 parameter: float) -> None:
+    def __init__(self, parameter: float) -> None:
         self.parameter = parameter
         self._results: list[float] = []
 
@@ -39,9 +39,7 @@ class Bandit(ABC):
         The estimated primary parameter.
         """
 
-    def _residual(self,
-                  parameter: float,
-                  parameter_hat: float) -> float:
+    def _residual(self, parameter: float, parameter_hat: float) -> float:
         """
         Calculate difference between a true
         parameter and an estimated parameter.
@@ -77,11 +75,10 @@ class TwoParameterBandit(Bandit, ABC):
 
     Examples may include Gaussian.
     """
+
     num_parameters = 2
 
-    def __init__(self,
-                 parameter: float,
-                 secondary_parameter: float) -> None:
+    def __init__(self, parameter: float, secondary_parameter: float) -> None:
         super().__init__(parameter)
         self.secondary_parameter = secondary_parameter
 
@@ -101,14 +98,12 @@ class TwoParameterBandit(Bandit, ABC):
         return self._residual(self.secondary_parameter, self.secondary_parameter_hat)
 
 
-
 class BernoulliBandit(Bandit):
     """
     Single bandit, simulating over a Bernoulli distribution.
     """
 
-    def __init__(self,
-                 parameter: float) -> None:
+    def __init__(self, parameter: float) -> None:
         if 0 > parameter < 1:
             raise ValueError(
                 f"parameter must be 0 <= parameter <= 1"
@@ -140,9 +135,8 @@ class GaussianBandit(TwoParameterBandit):
     """
     Single bandit, simulating over a Gaussian distribution.
     """
-    def __init__(self,
-                 parameter: float,
-                 secondary_parameter: float) -> None:
+
+    def __init__(self, parameter: float, secondary_parameter: float) -> None:
         if secondary_parameter < 0:
             raise ValueError(
                 "secondary_parameter must be < 0"
@@ -174,9 +168,9 @@ class GaussianBandit(TwoParameterBandit):
         """
         The estimated variance for this bandit.
         """
-        sum([result - self.parameter_hat for result in self._results]) \
-            / len(self._results)
-
+        sum([result - self.parameter_hat for result in self._results]) / len(
+            self._results
+        )
 
 
 @dataclass
