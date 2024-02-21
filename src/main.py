@@ -87,8 +87,8 @@ def _validate_args(
 
 @app.command()
 def simulate(
-    strategy: Strategy = Strategy.epsilon_greedy.value,
-    distribution: Distribution = Distribution.bernoulli.value,
+    strategy: Strategy = Strategy.epsilon_greedy,
+    distribution: Distribution = Distribution.bernoulli,
     num_simulations: Annotated[int, typer.Option(min=10)] = 500,
     num_bandits: Annotated[int, typer.Option(min=2)] = 10,
     print_metrics: bool = False,

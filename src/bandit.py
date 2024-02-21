@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from functools import total_ordering
 from math import inf
 from random import choice
@@ -10,7 +10,7 @@ from random import choice
 from numpy.random import binomial, normal
 
 
-class Distribution(str, Enum):
+class Distribution(StrEnum):
     bernoulli = "bernoulli"
     gaussian = "gaussian"
 

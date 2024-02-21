@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from random import uniform
 
 from src.bandit import Bandit, BanditCollection
@@ -11,7 +11,7 @@ from src.metrics import OneParameterMetrics, TwoParameterMetrics
 from src.utils.utils import ucb
 
 
-class Strategy(str, Enum):
+class Strategy(StrEnum):
     epsilon_first = "epsilon_first"
     epsilon_decreasing = "epsilon_decreasing"
     epsilon_greedy = "epsilon_greedy"
