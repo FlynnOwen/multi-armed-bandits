@@ -4,10 +4,7 @@ from typing import Annotated
 
 import typer
 
-from src.bandit import (
-    BanditCollection,
-    Distribution
-)
+from src.bandit import BanditCollection, Distribution
 from src.simulation import Strategy, strategy_factory
 
 app = typer.Typer()
@@ -24,16 +21,17 @@ def main(
     parameter_one_values: list[float],
     parameter_two_values: list[float] | None,
 ) -> None:
-    bandit_collection = (BanditCollection
-                         .from_distribution(distribution=distirbution,
-                                            parameter_one_values=parameter_one_values,
-                                            parameter_two_values=parameter_two_values))
+    bandit_collection = BanditCollection.from_distribution(
+        distribution=distirbution,
+        parameter_one_values=parameter_one_values,
+        parameter_two_values=parameter_two_values,
+    )
     simulation = strategy_factory(
         strategy=strategy,
         bandit_collection=bandit_collection,
         num_simulations=num_simulations,
         epsilon=epsilon,
-        decay_rate=decay_rate, # HACK: This parameter should only be passed to some strategies. # noqa: E501
+        decay_rate=decay_rate,  # HACK: This parameter should only be passed to some strategies. # noqa: E501
     )
 
     simulation.full_simulation()

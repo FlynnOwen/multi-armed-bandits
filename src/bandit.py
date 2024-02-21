@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from enum import Enum
 from functools import total_ordering
 from math import inf
 from random import choice
-from enum import Enum
 
 from numpy.random import binomial, normal
 
@@ -42,11 +42,10 @@ class Bandit(ABC):
 
     Examples may include Bernoulli or Poisson.
     """
+
     num_parameters = 1
 
-    def __init__(self,
-                 parameter: float,
-                 **kwargs) -> None:
+    def __init__(self, parameter: float, **kwargs) -> None:
         self.parameter = parameter
         self._results: list[float] = []
 
@@ -103,12 +102,10 @@ class TwoParameterBandit(Bandit, ABC):
 
     Examples may include Gaussian.
     """
+
     num_parameters = 2
 
-    def __init__(self,
-                 parameter: float,
-                 secondary_parameter: float,
-                 **kwargs) -> None:
+    def __init__(self, parameter: float, secondary_parameter: float, **kwargs) -> None:
         super().__init__(parameter)
         self.secondary_parameter = secondary_parameter
 
@@ -133,9 +130,7 @@ class BernoulliBandit(Bandit):
     Single bandit, simulating over a Bernoulli distribution.
     """
 
-    def __init__(self,
-                 parameter: float,
-                 **kwargs) -> None:
+    def __init__(self, parameter: float, **kwargs) -> None:
         if 0 > parameter < 1:
             raise ValueError(
                 f"parameter must be 0 <= parameter <= 1"
@@ -168,10 +163,7 @@ class GaussianBandit(TwoParameterBandit):
     Single bandit, simulating over a Gaussian distribution.
     """
 
-    def __init__(self,
-                 parameter: float,
-                 secondary_parameter: float,
-                 **kwargs) -> None:
+    def __init__(self, parameter: float, secondary_parameter: float, **kwargs) -> None:
         if secondary_parameter < 0:
             raise ValueError(
                 "secondary_parameter must be < 0"
@@ -218,10 +210,12 @@ class BanditCollection:
     results: list[int] = field(default_factory=list)
 
     @classmethod
-    def from_distribution(cls, #noqa
-                          distribution: Distribution,
-                          parameter_one_values: list[float],
-                          parameter_two_values: list[float] | None):
+    def from_distribution(
+        cls,  # noqa
+        distribution: Distribution,
+        parameter_one_values: list[float],
+        parameter_two_values: list[float] | None,
+    ):
         """
         Constructor using list(s) of parameters and a bandit type.
         """
@@ -229,8 +223,10 @@ class BanditCollection:
         if distribution in Distribution.one_parameter_family:
             bandits = [bandit_type(parameter) for parameter in parameter_one_values]
         else:
-            bandits = [bandit_type(parameter_one_values[i], parameter_two_values[i])
-                       for i in range(len(parameter_one_values))]
+            bandits = [
+                bandit_type(parameter_one_values[i], parameter_two_values[i])
+                for i in range(len(parameter_one_values))
+            ]
 
         return cls(bandits=bandits)
 

@@ -3,8 +3,8 @@ from __future__ import annotations
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from random import uniform
 from enum import Enum
+from random import uniform
 
 from src.bandit import Bandit, BanditCollection
 from src.metrics import OneParameterMetrics, TwoParameterMetrics
