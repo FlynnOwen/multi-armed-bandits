@@ -200,7 +200,7 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
         """
         Boolean: Has the threshold for the exploitation phase passed.
         """
-        return self.epsilon * self.num_simulations >= self.simulation_num
+        return self.epsilon * self.num_simulations <= self.simulation_num
 
     def simulate_one(self) -> None:
         if not self.exploitation_phase:
