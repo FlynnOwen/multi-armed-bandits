@@ -129,7 +129,8 @@ class Metrics(ABC):
         )
         ax.despine(left=True)
         ax.set(title=f"Simulation Estimated {parameter_type} "
-                      "vs True {parameter_type} Parameters")
+                      f"vs True {parameter_type} Parameters")
+        plt.show()
 
     def pull_residual_scatterplot(self,
                                   simulation_counts: list[int],
@@ -151,7 +152,8 @@ class Metrics(ABC):
             y="Number of Pulls",
         )
         ax.set(title=f"Number of Bandit Pulls vs Absolute "
-                      "{parameter_type} parameter Residual of Bandit")
+                      f"{parameter_type} parameter Residual of Bandit")
+        plt.show()
 
     def reward_timeseries_plot(self) -> None:
         """
