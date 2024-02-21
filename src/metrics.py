@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Annotated
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -86,12 +87,43 @@ class Metrics(ABC):
             ).round(self.rounding_dp)
         )
 
-    @abstractmethod
-    def residual_barplots(self) -> None:
+    def residual_barplots(self,
+                          estimated_parameters: list[float],
+                          true_parameters: list[float],
+                          parameter_type: Annotated[str, "Primary", "Secondary"] = "primary", #noqa
+                          ) -> None:
         """
         Barplots showing estimated vs true Parameter
         values for each bandit.
         """
+        parameters = estimated_parameters + true_parameters
+
+        parameter_types = ["Estimated" for _ in range(len(self.bandit_collection))] + [
+            "True" for _ in range(len(self.bandit_collection))
+        ]
+
+        bandit_id = list(range(1, len(self.bandit_collection.bandits) + 1)) * 2
+
+        data = pd.DataFrame(
+            {
+                "Parameter Value": parameters,
+                "Parameter Type": parameter_types,
+                "Bandit ID": bandit_id,
+            }
+        )
+
+        sns.set_theme(style="whitegrid")
+        ax = sns.catplot(
+            data=data,
+            x="Bandit ID",
+            y="Parameter Value",
+            hue="Parameter Type",
+            kind="bar",
+            alpha=0.8,
+        )
+        ax.despine(left=True)
+        ax.set(title=f"Simulation Estimated {parameter_type} "
+                      "vs True {parameter_type} Parameters")
 
     @abstractmethod
     def pull_residual_scatterplot(self) -> None:
@@ -127,14 +159,12 @@ class Metrics(ABC):
         plt.legend()
         plt.show()
 
+    @abstractmethod
     def generate_plots(self) -> None:
         """
         Generates plots to stdout of the multiarmed
         bandit simulation process.
         """
-        self.residual_barplots()
-        self.pull_residual_scatterplot()
-        self.reward_timeseries_plot()
 
 
 @dataclass
@@ -170,41 +200,6 @@ class OneParameterMetrics(Metrics):
             numalign="left",
         )
 
-    def residual_barplots(self) -> None:
-        """
-        Barplots showing estimated vs true Parameter
-        values for each bandit.
-        """
-        parameters = [
-            bandit.parameter_hat for bandit in self.bandit_collection.bandits
-        ] + [bandit.parameter for bandit in self.bandit_collection.bandits]
-
-        parameter_types = ["Estimated" for _ in range(len(self.bandit_collection))] + [
-            "True" for _ in range(len(self.bandit_collection))
-        ]
-
-        bandit_id = list(range(1, len(self.bandit_collection.bandits) + 1)) * 2
-
-        data = pd.DataFrame(
-            {
-                "Parameter Value": parameters,
-                "Parameter Type": parameter_types,
-                "Bandit ID": bandit_id,
-            }
-        )
-
-        sns.set_theme(style="whitegrid")
-        ax = sns.catplot(
-            data=data,
-            x="Bandit ID",
-            y="Parameter Value",
-            hue="Parameter Type",
-            kind="bar",
-            alpha=0.8,
-        )
-        ax.despine(left=True)
-        ax.set(title="Simulation Estimated vs True Parameters")
-
     def pull_residual_scatterplot(self) -> None:
         """
         Scatterplot showing number of bandit pulls vs
@@ -223,6 +218,19 @@ class OneParameterMetrics(Metrics):
             y="Number of Pulls",
         )
         ax.set(title="Number of Bandit Pulls vs Absolute Residual of Bandit")
+
+    def generate_plots(self) -> None:
+        """
+        Generates plots to stdout of the multiarmed
+        bandit simulation process.
+        """
+        true_parameters = [bandit.parameter for bandit in self.bandit_collection]
+        estimated_parameters = [bandit.parameter_hat for bandit in self.bandit_collection]
+        self.residual_barplots(true_parameters=true_parameters,
+                               estimated_parameters=estimated_parameters,
+                               parameter_type="Primary")
+        self.pull_residual_scatterplot()
+        self.reward_timeseries_plot()
 
 
 @dataclass
@@ -255,15 +263,15 @@ class TwoParameterMetrics(Metrics):
                     self.bandit_collection.optimal_bandit.parameter,
                 ],
                 [
-                    "optimal bandit secondary parameter true",
-                    self.bandit_collection.optimal_bandit.secondary_parameter,
-                ],
-                [
                     "optimal bandit parameter hat",
                     round(
                         self.bandit_collection.optimal_bandit.parameter_hat,
                         self.rounding_dp,
                     ),
+                ],
+                [
+                    "optimal bandit secondary parameter true",
+                    self.bandit_collection.optimal_bandit.secondary_parameter,
                 ],
                 [
                     "optimal bandit secondary parameter hat",
@@ -283,43 +291,6 @@ class TwoParameterMetrics(Metrics):
             tablefmt="rounded_outline",
             numalign="left",
         )
-
-    def residual_barplots(self) -> None:
-        """
-        Barplots showing estimated vs true Parameter
-        values for each bandit.
-
-        FIXME: Implement.
-        """
-        parameters = [
-            bandit.parameter_hat for bandit in self.bandit_collection.bandits
-        ] + [bandit.parameter for bandit in self.bandit_collection.bandits]
-
-        parameter_types = ["Estimated" for _ in range(len(self.bandit_collection))] + [
-            "True" for _ in range(len(self.bandit_collection))
-        ]
-
-        bandit_id = list(range(1, len(self.bandit_collection.bandits) + 1)) * 2
-
-        data = pd.DataFrame(
-            {
-                "Parameter Value": parameters,
-                "Parameter Type": parameter_types,
-                "Bandit ID": bandit_id,
-            }
-        )
-
-        sns.set_theme(style="whitegrid")
-        ax = sns.catplot(
-            data=data,
-            x="Bandit ID",
-            y="Parameter Value",
-            hue="Parameter Type",
-            kind="bar",
-            alpha=0.8,
-        )
-        ax.despine(left=True)
-        ax.set(title="Simulation Estimated vs True Parameters")
 
     def pull_residual_scatterplot(self) -> None:
         """
@@ -341,3 +312,29 @@ class TwoParameterMetrics(Metrics):
             y="Number of Pulls",
         )
         ax.set(title="Number of Bandit Pulls vs Absolute Residual of Bandit")
+
+    def generate_plots(self) -> None:
+        """
+        Generates plots to stdout of the multiarmed
+        bandit simulation process.
+        """
+        true_parameters = [bandit.parameter
+                           for bandit
+                           in self.bandit_collection]
+        estimated_parameters = [bandit.parameter_hat
+                                for bandit
+                                in self.bandit_collection]
+        true_secondary_parameters = [bandit.secondary_parameter
+                                    for bandit
+                                    in self.bandit_collection]
+        estimated_secondary_parameters = [bandit.secondary_parameter_hat
+                                         for bandit
+                                         in self.bandit_collection]
+        self.residual_barplots(true_parameters=true_parameters,
+                               estimated_parameters=estimated_parameters,
+                               parameter_type="Primary")
+        self.residual_barplots(true_parameters=true_secondary_parameters,
+                               estimated_parameters=estimated_secondary_parameters,
+                               parameter_type="Secondary")
+        self.pull_residual_scatterplot()
+        self.reward_timeseries_plot()
