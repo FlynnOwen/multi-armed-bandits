@@ -176,7 +176,7 @@ class GaussianBandit(TwoParameterBandit):
         Generates a single result from the pull of the
         armed bandit.
         """
-        result = normal(loc=self.parameter, scale=self.secondary_parameter, size=1)
+        result = normal(loc=self.parameter, scale=self.secondary_parameter)
         self._results.append(result)
 
         return result
@@ -195,7 +195,7 @@ class GaussianBandit(TwoParameterBandit):
         """
         The estimated variance for this bandit.
         """
-        sum([result - self.parameter_hat for result in self._results]) / len(
+        return sum([result - self.parameter_hat for result in self._results]) / len(
             self._results
         )
 
@@ -210,8 +210,8 @@ class BanditCollection:
     results: list[int] = field(default_factory=list)
 
     @classmethod
-    def from_distribution(
-        cls,  # noqa
+    def from_distribution( # noqa
+        cls,
         distribution: Distribution,
         parameter_one_values: list[float],
         parameter_two_values: list[float] | None,
