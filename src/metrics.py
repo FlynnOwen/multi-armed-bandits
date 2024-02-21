@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Annotated
+from enum import StrEnum
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,6 +10,11 @@ import seaborn as sns
 from tabulate import tabulate
 
 from src.bandit import BanditCollection
+
+
+class ParameterType:
+    primary = "Primary"
+    secondary = "Secondary"
 
 
 @dataclass
@@ -90,7 +96,7 @@ class Metrics(ABC):
     def residual_barplots(self,
                           estimated_parameters: list[float],
                           true_parameters: list[float],
-                          parameter_type: Annotated[str, "Primary", "Secondary"] = "primary", #noqa
+                          parameter_type: ParameterType,
                           ) -> None:
         """
         Barplots showing estimated vs true Parameter
@@ -125,12 +131,27 @@ class Metrics(ABC):
         ax.set(title=f"Simulation Estimated {parameter_type} "
                       "vs True {parameter_type} Parameters")
 
-    @abstractmethod
-    def pull_residual_scatterplot(self) -> None:
+    def pull_residual_scatterplot(self,
+                                  simulation_counts: list[int],
+                                  abs_residuals: list[float],
+                                  parameter_type: ParameterType,
+                                  ) -> None:
         """
         Scatterplot showing number of bandit pulls vs
         the absolute residual for each bandit.
         """
+        sim_counts_residuals = pd.DataFrame(
+            {"Number of Pulls": simulation_counts, "Absolute Residual": abs_residuals}
+        )
+
+        ax = sns.scatterplot(
+            color="r",
+            data=sim_counts_residuals,
+            x="Absolute Residual",
+            y="Number of Pulls",
+        )
+        ax.set(title=f"Number of Bandit Pulls vs Absolute "
+                      "{parameter_type} parameter Residual of Bandit")
 
     def reward_timeseries_plot(self) -> None:
         """
@@ -200,25 +221,6 @@ class OneParameterMetrics(Metrics):
             numalign="left",
         )
 
-    def pull_residual_scatterplot(self) -> None:
-        """
-        Scatterplot showing number of bandit pulls vs
-        the absolute residual for each bandit.
-        """
-        simulation_counts = [len(bandit) for bandit in self.bandit_collection]
-        abs_residuals = [abs(bandit.residual) for bandit in self.bandit_collection]
-        sim_counts_residuals = pd.DataFrame(
-            {"Number of Pulls": simulation_counts, "Absolute Residual": abs_residuals}
-        )
-
-        ax = sns.scatterplot(
-            color="r",
-            data=sim_counts_residuals,
-            x="Absolute Residual",
-            y="Number of Pulls",
-        )
-        ax.set(title="Number of Bandit Pulls vs Absolute Residual of Bandit")
-
     def generate_plots(self) -> None:
         """
         Generates plots to stdout of the multiarmed
@@ -226,10 +228,15 @@ class OneParameterMetrics(Metrics):
         """
         true_parameters = [bandit.parameter for bandit in self.bandit_collection]
         estimated_parameters = [bandit.parameter_hat for bandit in self.bandit_collection]
+        simulation_counts = [len(bandit) for bandit in self.bandit_collection]
+        abs_residuals = [bandit.residual for bandit in self.bandit_collection]
+
         self.residual_barplots(true_parameters=true_parameters,
                                estimated_parameters=estimated_parameters,
-                               parameter_type="Primary")
-        self.pull_residual_scatterplot()
+                               parameter_type=ParameterType.primary)
+        self.pull_residual_scatterplot(simulation_counts=simulation_counts,
+                                       abs_residuals=abs_residuals,
+                                       parameter_type=ParameterType.primary)
         self.reward_timeseries_plot()
 
 
@@ -292,27 +299,6 @@ class TwoParameterMetrics(Metrics):
             numalign="left",
         )
 
-    def pull_residual_scatterplot(self) -> None:
-        """
-        Scatterplot showing number of bandit pulls vs
-        the absolute residual for each bandit.
-
-        FIXME: Implement.
-        """
-        simulation_counts = [len(bandit) for bandit in self.bandit_collection]
-        abs_residuals = [abs(bandit.residual) for bandit in self.bandit_collection]
-        sim_counts_residuals = pd.DataFrame(
-            {"Number of Pulls": simulation_counts, "Absolute Residual": abs_residuals}
-        )
-
-        ax = sns.scatterplot(
-            color="r",
-            data=sim_counts_residuals,
-            x="Absolute Residual",
-            y="Number of Pulls",
-        )
-        ax.set(title="Number of Bandit Pulls vs Absolute Residual of Bandit")
-
     def generate_plots(self) -> None:
         """
         Generates plots to stdout of the multiarmed
@@ -330,11 +316,26 @@ class TwoParameterMetrics(Metrics):
         estimated_secondary_parameters = [bandit.secondary_parameter_hat
                                          for bandit
                                          in self.bandit_collection]
+        simulation_counts = [len(bandit)
+                             for bandit
+                             in self.bandit_collection]
+        abs_residuals = [bandit.residual
+                         for bandit
+                         in self.bandit_collection]
+        abs_secondary_residuals = [bandit.secondary_residual
+                                   for bandit
+                                   in self.bandit_collection]
+
         self.residual_barplots(true_parameters=true_parameters,
                                estimated_parameters=estimated_parameters,
-                               parameter_type="Primary")
+                               parameter_type=ParameterType.primary)
         self.residual_barplots(true_parameters=true_secondary_parameters,
                                estimated_parameters=estimated_secondary_parameters,
-                               parameter_type="Secondary")
-        self.pull_residual_scatterplot()
+                               parameter_type=ParameterType.secondary)
+        self.pull_residual_scatterplot(simulation_counts=simulation_counts,
+                                       abs_residuals=abs_residuals,
+                                       parameter_type=ParameterType.primary)
+        self.pull_residual_scatterplot(simulation_counts=simulation_counts,
+                                       abs_residuals=abs_secondary_residuals,
+                                       parameter_type=ParameterType.secondary)
         self.reward_timeseries_plot()
