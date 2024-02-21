@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Annotated
-from enum import StrEnum
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -166,11 +164,11 @@ class Metrics(ABC):
         plt.axhline(
             y=self.bandit_collection.optimal_bandit.parameter_hat,
             color="r",
-            linestyle="--",
+            linestyle="-",
             label="Optimal Bandit Estimated Parameter",
         )
         plt.axhline(
-            y=0.5, color="g", linestyle="--", label="Optimal Bandit True Parameter"
+            y=self.bandit_collection.optimal_bandit.parameter, color="g", linestyle="--", label="Optimal Bandit True Parameter"
         )
 
         ax.set(

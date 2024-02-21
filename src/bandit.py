@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import StrEnum
 from functools import total_ordering
-from math import inf
+from math import inf, sqrt
 from random import choice
 
 from numpy.random import binomial, normal
@@ -195,9 +195,9 @@ class GaussianBandit(TwoParameterBandit):
         """
         The estimated variance for this bandit.
         """
-        return sum([result - self.parameter_hat for result in self._results]) / len(
+        return sqrt(sum([(result - self.parameter_hat)**2 for result in self._results]) / len(
             self._results
-        )
+        ))
 
 
 @dataclass
