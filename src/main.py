@@ -5,7 +5,11 @@ from typing import Annotated
 
 import typer
 
-from src.bandit import Bandit, BanditCollection, BernoulliBandit, GaussianBandit
+from src.bandit import (
+    BanditCollection,
+    Distribution,
+    distribution_factory
+)
 from src.simulation import (
     EpsilonDecreasingStrategy,
     EpsilonFirstStrategy,
@@ -14,30 +18,6 @@ from src.simulation import (
 )
 
 app = typer.Typer()
-
-
-class Distribution(str, Enum):
-    bernoulli = "bernoulli"
-    gaussian = "gaussian"
-
-    @classmethod
-    @property
-    def one_parameter_family(cls):  # noqa: ANN206
-        return {cls.bernoulli}
-
-    @classmethod
-    @property
-    def two_parameter_family(cls):  # noqa: ANN206
-        return {cls.gaussian}
-
-
-def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
-    distribution_map = {
-        Distribution.bernoulli: BernoulliBandit,
-        Distribution.gaussian: GaussianBandit,
-    }
-
-    return distribution_map[distribution]
 
 
 class Strategy(str, Enum):
@@ -60,19 +40,17 @@ def main(
     strategy: Strategy,
     distirbution: Distribution,
     num_simulations: int,
-    num_bandits: int,
     print_metrics: bool,
     print_plots: bool,
     epsilon: float,
-    decay_rate: float,
+    decay_rate: float | None,
     parameter_one_values: list[float],
-    parameter_two_values: list[float],
+    parameter_two_values: list[float] | None,
 ) -> None:
-    sel_distribution = distribution_factory(distribution=distirbution)
-
-    bandit_collection = BanditCollection(
-        [sel_distribution(parameter=parameter_one_values[i], secondary_parameter=parameter_two_values[i]) for i in range(num_bandits)]
-    )
+    bandit_collection = (BanditCollection
+                         .from_distribution(distribution=distirbution,
+                                            parameter_one_values=parameter_one_values,
+                                            parameter_two_values=parameter_two_values))
     simulation = strategy_factory(
         strategy=strategy,
         bandit_collection=bandit_collection,
@@ -171,7 +149,6 @@ def simulate(
         strategy=strategy,
         distirbution=distribution,
         num_simulations=num_simulations,
-        num_bandits=num_bandits,
         print_metrics=print_metrics,
         print_plots=print_plots,
         epsilon=epsilon,

@@ -1,10 +1,37 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import total_ordering
 from math import inf
 from random import choice
+from enum import Enum
 
 from numpy.random import binomial, normal
+
+
+class Distribution(str, Enum):
+    bernoulli = "bernoulli"
+    gaussian = "gaussian"
+
+    @classmethod
+    @property
+    def one_parameter_family(cls):  # noqa: ANN206
+        return {cls.bernoulli}
+
+    @classmethod
+    @property
+    def two_parameter_family(cls):  # noqa: ANN206
+        return {cls.gaussian}
+
+
+def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
+    distribution_map = {
+        Distribution.bernoulli: BernoulliBandit,
+        Distribution.gaussian: GaussianBandit,
+    }
+
+    return distribution_map[distribution]
 
 
 @total_ordering
@@ -190,14 +217,22 @@ class BanditCollection:
     bandits: list[Bandit]
     results: list[int] = field(default_factory=list)
 
-    def from_parameter_list(cls,  #noqa
-                            bandit_type: str,
-                            parameter_one_values: list[float],
-                            **kwargs): #noqa
+    @classmethod
+    def from_distribution(cls, #noqa
+                          distribution: Distribution,
+                          parameter_one_values: list[float],
+                          parameter_two_values: list[float] | None):
         """
         Constructor using list(s) of parameters and a bandit type.
         """
-        return cls(...)
+        bandit_type = distribution_factory(distribution=distribution)
+        if distribution in Distribution.one_parameter_family:
+            bandits = [bandit_type(parameter) for parameter in parameter_one_values]
+        else:
+            bandits = [bandit_type(parameter_one_values[i], parameter_two_values[i])
+                       for i in range(len(parameter_one_values))]
+
+        return cls(bandits=bandits)
 
     def __post_init__(self):
         self.num_parameters = self.random_bandit.num_parameters
