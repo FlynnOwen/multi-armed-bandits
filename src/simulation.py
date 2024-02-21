@@ -4,10 +4,27 @@ import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from random import uniform
+from enum import Enum
 
 from src.bandit import Bandit, BanditCollection
 from src.metrics import OneParameterMetrics, TwoParameterMetrics
 from src.utils.utils import ucb
+
+
+class Strategy(str, Enum):
+    epsilon_first = "epsilon_first"
+    epsilon_decreasing = "epsilon_decreasing"
+    epsilon_greedy = "epsilon_greedy"
+
+
+def strategy_factory(strategy: Strategy, **kwargs) -> SemiUniformStrategy:  # noqa: ANN003
+    strategy_map = {
+        Strategy.epsilon_first: EpsilonFirstStrategy,
+        Strategy.epsilon_decreasing: EpsilonDecreasingStrategy,
+        Strategy.epsilon_greedy: EpsilonGreedyStrategy,
+    }
+
+    return strategy_map[strategy](**kwargs)
 
 
 @dataclass

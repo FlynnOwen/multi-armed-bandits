@@ -1,5 +1,4 @@
 import json
-from enum import Enum
 from pathlib import Path
 from typing import Annotated
 
@@ -7,33 +6,11 @@ import typer
 
 from src.bandit import (
     BanditCollection,
-    Distribution,
-    distribution_factory
+    Distribution
 )
-from src.simulation import (
-    EpsilonDecreasingStrategy,
-    EpsilonFirstStrategy,
-    EpsilonGreedyStrategy,
-    SemiUniformStrategy,
-)
+from src.simulation import Strategy, strategy_factory
 
 app = typer.Typer()
-
-
-class Strategy(str, Enum):
-    epsilon_first = "epsilon_first"
-    epsilon_decreasing = "epsilon_decreasing"
-    epsilon_greedy = "epsilon_greedy"
-
-
-def strategy_factory(strategy: Strategy, **kwargs) -> SemiUniformStrategy:  # noqa: ANN003
-    strategy_map = {
-        Strategy.epsilon_first: EpsilonFirstStrategy,
-        Strategy.epsilon_decreasing: EpsilonDecreasingStrategy,
-        Strategy.epsilon_greedy: EpsilonGreedyStrategy,
-    }
-
-    return strategy_map[strategy](**kwargs)
 
 
 def main(
