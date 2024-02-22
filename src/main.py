@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 from enum import StrEnum
 
 import typer
@@ -20,24 +20,36 @@ def main(
     strategy: Strategy,
     distirbution: Distribution,
     num_simulations: int,
+    num_bandits: int,
     print_metrics: bool,
     print_plots: bool,
     epsilon: float,
     decay_rate: float | None,
+    bandit_gen_method: BanditGenMethod,
     parameter_one_values: list[float] | None,
     parameter_two_values: list[float] | None,
-    num_bandits: int,
     parameter_one_mean: float | None,
     parameter_one_std: float | None,
     parameter_two_mean: float | None,
     parameter_two_std: float | None
 
 ) -> None:
-    bandit_collection = BanditCollection.from_parameter_list(
-        distribution=distirbution,
-        parameter_one_values=parameter_one_values,
-        parameter_two_values=parameter_two_values,
-    )
+    if bandit_gen_method == BanditGenMethod.from_list:
+        bandit_collection = BanditCollection.from_parameter_list(
+            distribution=distirbution,
+            parameter_one_values=parameter_one_values,
+            parameter_two_values=parameter_two_values,
+        )
+    else:
+        bandit_collection = BanditCollection.from_parameter_distribution(
+            distribution=distirbution,
+            num_bandits=num_bandits,
+            parameter_one_mean=parameter_one_mean,
+            parameter_two_mean=parameter_two_mean,
+            parameter_one_std=parameter_one_std,
+            parameter_two_std=parameter_two_std
+        )
+
     simulation = strategy_factory(
         strategy=strategy,
         bandit_collection=bandit_collection,
@@ -59,6 +71,7 @@ def _validate_args(
     strategy: Strategy,
     distribution: Distribution,
     decay_rate: float,
+    bandit_gen_method: BanditGenMethod,
     parameter_one_values: list[float] | None,
     parameter_two_values: list[float] | None,
     parameter_one_mean: float | None,
@@ -75,14 +88,13 @@ def _validate_args(
         )
 
     if (distribution in Distribution.two_parameter_family and (
-        parameter_two_values is None and (
+        bandit_gen_method == BanditGenMethod.from_dist and (
             parameter_two_mean is None or parameter_two_std is None
             ))):  # noqa: E501
-        raise ValueError(
-            f"Distribution {distribution.value} requires two "
-            "parameters, rather than one. Please pass values for arg "
-            "'parameter_two_values'"
-        )
+        raise ValueError("Either 'parameter_two_values' or "
+                         "'parameter_two_mean' and 'paramater_two_std' "
+                         "must be passed as args.")
+
 
     if num_bandits != len(parameter_one_values):
         raise ValueError(
@@ -93,14 +105,14 @@ def _validate_args(
 
     if distribution in Distribution.two_parameter_family and num_bandits != len(
         parameter_two_values
-    ):  # noqa: E501
+    ):
         raise ValueError(
             "Length of parameter 'parameter_two_values' must be equal to "
             f"parameter 'num_bandits'. Got {len(parameter_two_values)} "
             f"and {num_bandits} respectively."
         )
 
-    if parameter_one_values is None and (
+    if bandit_gen_method == BanditGenMethod.from_dist and (
         parameter_one_mean is None or parameter_one_std is None
         ):
         raise ValueError("Either 'parameter_one_values' or "
@@ -131,6 +143,11 @@ def simulate(
         500,
     ],
     parameter_two_values: list[float] = None,
+    parameter_one_mean: list[float] = None,
+    parameter_one_std: list[float] = None,
+    parameter_two_mean: list[float] = None,
+    parameter_two_std: list[float] = None,
+
 ) -> None:  # noqa: ANN003
     """
     Runs a multi-armed bandit simulation.
@@ -139,23 +156,34 @@ def simulate(
                         if parameter_one_values is not None \
                         else BanditGenMethod.from_dist
     _validate_args(
-        num_bandits=num_bandits,
         strategy=strategy,
         distribution=distribution,
+        num_bandits=num_bandits,
         decay_rate=decay_rate,
+        bandit_gen_method=bandit_gen_method,
         parameter_one_values=parameter_one_values,
         parameter_two_values=parameter_two_values,
+        parameter_one_mean=parameter_one_mean,
+        parameter_two_mean=parameter_two_mean,
+        parameter_one_std=parameter_one_std,
+        parameter_two_std=parameter_two_std
     )
     main(
         strategy=strategy,
         distirbution=distribution,
         num_simulations=num_simulations,
+        num_bandits=num_bandits,
         print_metrics=print_metrics,
         print_plots=print_plots,
         epsilon=epsilon,
         decay_rate=decay_rate,
+        bandit_gen_method=bandit_gen_method,
         parameter_one_values=parameter_one_values,
         parameter_two_values=parameter_two_values,
+        parameter_one_mean=parameter_one_mean,
+        parameter_two_mean=parameter_two_mean,
+        parameter_one_std=parameter_one_std,
+        parameter_two_std=parameter_two_std
     )
 
 
