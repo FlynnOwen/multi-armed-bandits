@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 from enum import StrEnum
 
 import typer
@@ -130,18 +130,7 @@ def simulate(
     print_plots: bool = False,
     epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
     decay_rate: float = 0.05,
-    parameter_one_values: list[float] = [
-        200,
-        200,
-        200,
-        200,
-        200,
-        200,
-        200,
-        200,
-        200,
-        500,
-    ],
+    parameter_one_values: list[float] = None,
     parameter_two_values: list[float] = None,
     parameter_one_mean: list[float] = None,
     parameter_one_std: list[float] = None,
@@ -185,6 +174,48 @@ def simulate(
         parameter_one_std=parameter_one_std,
         parameter_two_std=parameter_two_std
     )
+
+
+@app.command()
+def simulate_fixed(
+    strategy: Strategy = Strategy.epsilon_greedy,
+    distribution: Distribution = Distribution.bernoulli,
+    num_simulations: Annotated[int, typer.Option(min=10)] = 500,
+    num_bandits: Annotated[int, typer.Option(min=2)] = 10,
+    print_metrics: bool = False,
+    print_plots: bool = False,
+    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
+    decay_rate: float = 0.05,
+    parameter_one_values: list[float] = None,
+    parameter_two_values: list[float] = None,
+):
+    """
+    Run a simulation from a fixed set of bandit
+    parameters.
+    """
+
+
+@app.command()
+def simulate_generate(
+    strategy: Strategy = Strategy.epsilon_greedy,
+    distribution: Distribution = Distribution.bernoulli,
+    num_simulations: Annotated[int, typer.Option(min=10)] = 500,
+    print_metrics: bool = False,
+    print_plots: bool = False,
+    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
+    decay_rate: float = 0.05,
+    num_bandits: Annotated[int, typer.Option(min=2)] = 10,
+    parameter_one_mean: list[float] = None,
+    parameter_one_std: list[float] = None,
+    parameter_two_mean: list[float] = None,
+    parameter_two_std: list[float] = None
+):
+    """
+    Run a simulation from a set of bandits
+    whose parameters are randomly generated
+    according to some distribution.
+    """
+
 
 
 @app.command()
