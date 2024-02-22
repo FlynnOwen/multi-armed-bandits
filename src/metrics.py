@@ -52,7 +52,7 @@ class Metrics(ABC):
     @property
     def mae(self) -> float:
         return self._mae(
-            residuals=[bandit.residual for bandit in self.bandit_collection]
+            residuals=self.bandit_collection.residuals
         )
 
     def _mape(self, residuals: list[float], parameters: list[float]) -> float:
@@ -70,8 +70,8 @@ class Metrics(ABC):
     @property
     def mape(self) -> float:
         return self._mape(
-            residuals=[bandit.residual for bandit in self.bandit_collection],
-            parameters=[bandit.parameter for bandit in self.bandit_collection],
+            residuals=self.bandit_collection.residuals,
+            parameters=self.bandit_collection.true_parameters,
         )
 
     @property
@@ -106,7 +106,7 @@ class Metrics(ABC):
             "True" for _ in range(len(self.bandit_collection))
         ]
 
-        bandit_id = list(range(1, len(self.bandit_collection.bandits) + 1)) * 2
+        bandit_id = list(range(1, len(self.bandit_collection) + 1)) * 2
 
         data = pd.DataFrame(
             {
@@ -226,16 +226,11 @@ class OneParameterMetrics(Metrics):
         Generates plots to stdout of the multiarmed
         bandit simulation process.
         """
-        true_parameters = [bandit.parameter for bandit in self.bandit_collection]
-        estimated_parameters = [bandit.parameter_hat for bandit in self.bandit_collection]
-        simulation_counts = [len(bandit) for bandit in self.bandit_collection]
-        abs_residuals = [bandit.residual for bandit in self.bandit_collection]
-
-        self.residual_barplots(true_parameters=true_parameters,
-                               estimated_parameters=estimated_parameters,
+        self.residual_barplots(true_parameters=self.bandit_collection.true_parameters,
+                               estimated_parameters=self.bandit_collection.estimated_parameters,
                                parameter_type=ParameterType.primary)
-        self.pull_residual_scatterplot(simulation_counts=simulation_counts,
-                                       abs_residuals=abs_residuals,
+        self.pull_residual_scatterplot(simulation_counts=self.bandit_collection.simulation_counts,
+                                       abs_residuals=map(abs, self.bandit_collection.residuals),
                                        parameter_type=ParameterType.primary)
         self.reward_timeseries_plot()
 
@@ -252,14 +247,14 @@ class TwoParameterMetrics(Metrics):
     @property
     def secondary_mae(self) -> float:
         return self._mae(
-            residuals=[bandit.residual for bandit in self.bandit_collection]
+            residuals=self.bandit_collection.residuals
         )
 
     @property
     def secondary_mape(self) -> float:
         return self._mape(
-            residuals=[bandit.residual for bandit in self.bandit_collection],
-            parameters=[bandit.parameter for bandit in self.bandit_collection],
+            residuals=self.bandit_collection.residuals,
+            parameters=self.bandit_collection.true_parameters,
         )
 
     def __str__(self) -> str:
@@ -304,38 +299,16 @@ class TwoParameterMetrics(Metrics):
         Generates plots to stdout of the multiarmed
         bandit simulation process.
         """
-        true_parameters = [bandit.parameter
-                           for bandit
-                           in self.bandit_collection]
-        estimated_parameters = [bandit.parameter_hat
-                                for bandit
-                                in self.bandit_collection]
-        true_secondary_parameters = [bandit.secondary_parameter
-                                    for bandit
-                                    in self.bandit_collection]
-        estimated_secondary_parameters = [bandit.secondary_parameter_hat
-                                         for bandit
-                                         in self.bandit_collection]
-        simulation_counts = [len(bandit)
-                             for bandit
-                             in self.bandit_collection]
-        abs_residuals = [bandit.residual
-                         for bandit
-                         in self.bandit_collection]
-        abs_secondary_residuals = [bandit.secondary_residual
-                                   for bandit
-                                   in self.bandit_collection]
-
-        self.residual_barplots(true_parameters=true_parameters,
-                               estimated_parameters=estimated_parameters,
+        self.residual_barplots(true_parameters=self.bandit_collection.true_parameters,
+                               estimated_parameters=self.bandit_collection.estimated_parameters,
                                parameter_type=ParameterType.primary)
-        self.residual_barplots(true_parameters=true_secondary_parameters,
-                               estimated_parameters=estimated_secondary_parameters,
+        self.residual_barplots(true_parameters=self.bandit_collection.true_secondary_parameters,
+                               estimated_parameters=self.bandit_collection.estimated_secondary_parameters,
                                parameter_type=ParameterType.secondary)
-        self.pull_residual_scatterplot(simulation_counts=simulation_counts,
-                                       abs_residuals=abs_residuals,
+        self.pull_residual_scatterplot(simulation_counts=self.bandit_collection.simulation_counts,
+                                       abs_residuals=map(abs, self.bandit_collection.residuals),
                                        parameter_type=ParameterType.primary)
-        self.pull_residual_scatterplot(simulation_counts=simulation_counts,
-                                       abs_residuals=abs_secondary_residuals,
+        self.pull_residual_scatterplot(simulation_counts=self.bandit_collection.simulation_counts,
+                                       abs_residuals=map(abs, self.bandit_collection.secondary_residuals),
                                        parameter_type=ParameterType.secondary)
         self.reward_timeseries_plot()

@@ -250,3 +250,40 @@ class BanditCollection:
     @property
     def random_bandit(self) -> Bandit:
         return choice(self.bandits)
+
+    @property
+    def true_parameters(self) -> list[float]:
+        return [bandit.parameter for bandit in self]
+
+    @property
+    def estimated_parameters(self) -> list[float]:
+        return [bandit.parameter_hat for bandit in self]
+
+    @property
+    def simulation_counts(self) -> list[int]:
+        return [len(bandit) for bandit in self]
+
+    @property
+    def residuals(self) -> list[float]:
+        return [bandit.residual for bandit in self]
+
+    @property
+    def true_secondary_parameters(self) -> list[float]:
+        if self.num_parameters == 1:
+            raise ValueError("Distribution requires >= 2 values to "
+                             "access secondary parameters")
+        return [bandit.secondary_parameter for bandit in self]
+
+    @property
+    def estimated_secondary_parameters(self) -> list[float]:
+        if self.num_parameters == 1:
+            raise ValueError("Distribution requires >= 2 values to "
+                             "access secondary parameters")
+        return [bandit.secondary_parameter_hat for bandit in self]
+
+    @property
+    def secondary_residuals(self) -> list[float]:
+        if self.num_parameters == 1:
+            raise ValueError("Distribution requires >= 2 values to "
+                             "access secondary parameters")
+        return [bandit.secondary_residual for bandit in self]
