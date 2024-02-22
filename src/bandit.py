@@ -210,7 +210,7 @@ class BanditCollection:
     results: list[int] = field(default_factory=list)
 
     @classmethod
-    def from_distribution( # noqa
+    def from_parameter_list( # noqa
         cls,
         distribution: Distribution,
         parameter_one_values: list[float],
@@ -229,6 +229,35 @@ class BanditCollection:
             ]
 
         return cls(bandits=bandits)
+
+    @classmethod
+    def from_parameter_distribution( #noqa
+        cls,
+        distribution: Distribution,
+        num_bandits: int,
+        parameter_one_mean: float,
+        parameter_one_std: float,
+        parameter_two_mean: float | None,
+        parameter_two_std: float | None
+    ):
+        """
+        Constructor using and a bandit type,
+        the number of bandits to generate, and the
+        mean and std of each parameter.
+        """
+        parameters = normal(loc=parameter_one_mean,
+                            scale=parameter_one_std,
+                            size=num_bandits).to_list()
+        if distribution in Distribution.two_parameter_family:
+            secondary_parameters = normal(loc=parameter_two_mean,
+                                          scale=parameter_two_std,
+                                          size=num_bandits).to_list()
+        else:
+            secondary_parameters = None
+
+        return cls.from_parameter_list(distribution=Distribution,
+                                       parameter_one_values=parameters,
+                                       parameter_two_values=secondary_parameters)
 
     def __post_init__(self):
         self.num_parameters = self.random_bandit.num_parameters

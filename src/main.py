@@ -21,7 +21,7 @@ def main(
     parameter_one_values: list[float],
     parameter_two_values: list[float] | None,
 ) -> None:
-    bandit_collection = BanditCollection.from_distribution(
+    bandit_collection = BanditCollection.from_parameter_list(
         distribution=distirbution,
         parameter_one_values=parameter_one_values,
         parameter_two_values=parameter_two_values,
