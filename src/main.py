@@ -18,37 +18,13 @@ class BanditGenMethod(StrEnum):
 
 def main(
     strategy: Strategy,
-    distirbution: Distribution,
     num_simulations: int,
-    num_bandits: int,
     print_metrics: bool,
     print_plots: bool,
     epsilon: float,
     decay_rate: float | None,
-    bandit_gen_method: BanditGenMethod,
-    parameter_one_values: list[float] | None,
-    parameter_two_values: list[float] | None,
-    parameter_one_mean: float | None,
-    parameter_one_std: float | None,
-    parameter_two_mean: float | None,
-    parameter_two_std: float | None
-
+    bandit_collection: BanditCollection
 ) -> None:
-    if bandit_gen_method == BanditGenMethod.from_list:
-        bandit_collection = BanditCollection.from_parameter_list(
-            distribution=distirbution,
-            parameter_one_values=parameter_one_values,
-            parameter_two_values=parameter_two_values,
-        )
-    else:
-        bandit_collection = BanditCollection.from_parameter_distribution(
-            distribution=distirbution,
-            num_bandits=num_bandits,
-            parameter_one_mean=parameter_one_mean,
-            parameter_two_mean=parameter_two_mean,
-            parameter_one_std=parameter_one_std,
-            parameter_two_std=parameter_two_std
-        )
 
     simulation = strategy_factory(
         strategy=strategy,
@@ -121,67 +97,10 @@ def _validate_args(
 
 
 @app.command()
-def simulate(
+def simulate_fixed( #noqa
     strategy: Strategy = Strategy.epsilon_greedy,
     distribution: Distribution = Distribution.bernoulli,
     num_simulations: Annotated[int, typer.Option(min=10)] = 500,
-    num_bandits: Annotated[int, typer.Option(min=2)] = 10,
-    print_metrics: bool = False,
-    print_plots: bool = False,
-    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
-    decay_rate: float = 0.05,
-    parameter_one_values: list[float] = None,
-    parameter_two_values: list[float] = None,
-    parameter_one_mean: list[float] = None,
-    parameter_one_std: list[float] = None,
-    parameter_two_mean: list[float] = None,
-    parameter_two_std: list[float] = None,
-
-) -> None:  # noqa: ANN003
-    """
-    Runs a multi-armed bandit simulation.
-    """
-    bandit_gen_method = BanditGenMethod.from_list \
-                        if parameter_one_values is not None \
-                        else BanditGenMethod.from_dist
-    _validate_args(
-        strategy=strategy,
-        distribution=distribution,
-        num_bandits=num_bandits,
-        decay_rate=decay_rate,
-        bandit_gen_method=bandit_gen_method,
-        parameter_one_values=parameter_one_values,
-        parameter_two_values=parameter_two_values,
-        parameter_one_mean=parameter_one_mean,
-        parameter_two_mean=parameter_two_mean,
-        parameter_one_std=parameter_one_std,
-        parameter_two_std=parameter_two_std
-    )
-    main(
-        strategy=strategy,
-        distirbution=distribution,
-        num_simulations=num_simulations,
-        num_bandits=num_bandits,
-        print_metrics=print_metrics,
-        print_plots=print_plots,
-        epsilon=epsilon,
-        decay_rate=decay_rate,
-        bandit_gen_method=bandit_gen_method,
-        parameter_one_values=parameter_one_values,
-        parameter_two_values=parameter_two_values,
-        parameter_one_mean=parameter_one_mean,
-        parameter_two_mean=parameter_two_mean,
-        parameter_one_std=parameter_one_std,
-        parameter_two_std=parameter_two_std
-    )
-
-
-@app.command()
-def simulate_fixed(
-    strategy: Strategy = Strategy.epsilon_greedy,
-    distribution: Distribution = Distribution.bernoulli,
-    num_simulations: Annotated[int, typer.Option(min=10)] = 500,
-    num_bandits: Annotated[int, typer.Option(min=2)] = 10,
     print_metrics: bool = False,
     print_plots: bool = False,
     epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
@@ -193,10 +112,33 @@ def simulate_fixed(
     Run a simulation from a fixed set of bandit
     parameters.
     """
+    bandit_gen_method = BanditGenMethod.from_list \
+                        if parameter_one_values is not None \
+                        else BanditGenMethod.from_dist
+    _validate_args(
+        strategy=strategy,
+        distribution=distribution,
+        decay_rate=decay_rate,
+        bandit_gen_method=bandit_gen_method,
+        parameter_one_values=parameter_one_values,
+        parameter_two_values=parameter_two_values,
+    )
+    main(
+        strategy=strategy,
+        distirbution=distribution,
+        num_simulations=num_simulations,
+        print_metrics=print_metrics,
+        print_plots=print_plots,
+        epsilon=epsilon,
+        decay_rate=decay_rate,
+        bandit_gen_method=bandit_gen_method,
+        parameter_one_values=parameter_one_values,
+        parameter_two_values=parameter_two_values
+    )
 
 
 @app.command()
-def simulate_generate(
+def simulate_generate( #noqa
     strategy: Strategy = Strategy.epsilon_greedy,
     distribution: Distribution = Distribution.bernoulli,
     num_simulations: Annotated[int, typer.Option(min=10)] = 500,
@@ -215,6 +157,30 @@ def simulate_generate(
     whose parameters are randomly generated
     according to some distribution.
     """
+    _validate_args(
+        strategy=strategy,
+        distribution=distribution,
+        num_bandits=num_bandits,
+        decay_rate=decay_rate,
+        parameter_one_mean=parameter_one_mean,
+        parameter_two_mean=parameter_two_mean,
+        parameter_one_std=parameter_one_std,
+        parameter_two_std=parameter_two_std
+    )
+    main(
+        strategy=strategy,
+        distirbution=distribution,
+        num_simulations=num_simulations,
+        num_bandits=num_bandits,
+        print_metrics=print_metrics,
+        print_plots=print_plots,
+        epsilon=epsilon,
+        decay_rate=decay_rate,
+        parameter_one_mean=parameter_one_mean,
+        parameter_two_mean=parameter_two_mean,
+        parameter_one_std=parameter_one_std,
+        parameter_two_std=parameter_two_std
+    )
 
 
 
@@ -230,7 +196,7 @@ def simulate_from_json(config: Path) -> None:
     if not config.is_file() and config.suffix != ".json":
         raise ValueError("config must be suffixed with '.json'.")
     simulation_args = json.load(config)
-    simulate(**simulation_args)
+    # simulate(**simulation_args)
 
 
 if __name__ == "__main__":
