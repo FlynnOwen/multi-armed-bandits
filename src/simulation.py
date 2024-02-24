@@ -54,7 +54,7 @@ class SemiUniformStrategy(ABC):
         bandit_collection: BanditCollection,
         num_simulations: int,
         epsilon: float = 0.2,
-        **kwargs
+        **kwargs,
     ):
         if 0 > epsilon < 1:
             raise ValueError(
@@ -128,8 +128,7 @@ class EpsilonGreedyStrategy(SemiUniformStrategy):
         random_value = self.gen_random_uniform()
         bandit = self._bandit_strategy(random_value=random_value)
         result = bandit.generate()
-        self.bandit_collection.results.append({"id": bandit.id,
-                                               "value": result})
+        self.bandit_collection.results.append({"id": bandit.id, "value": result})
 
 
 class EpsilonDecreasingStrategy(SemiUniformStrategy):

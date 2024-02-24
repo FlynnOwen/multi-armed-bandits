@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
@@ -6,7 +7,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from tabulate import tabulate
-from collections import defaultdict
 
 from src.bandit import BanditCollection
 
@@ -85,7 +85,9 @@ class Metrics(ABC):
     def average_reward_timeseries(self) -> list[float]:
         return list(
             (
-                np.cumsum([result["value"] for result in self.bandit_collection.results])
+                np.cumsum(
+                    [result["value"] for result in self.bandit_collection.results]
+                )
                 / np.arange(1, self.num_simulations + 1)
             ).round(self.rounding_dp)
         )
@@ -96,7 +98,8 @@ class Metrics(ABC):
         TODO: Implement.
         """
         values = [result["id"] for result in self.bandit_collection.results]
-        def find_index_ranges(values: list[int]) -> dict[int, list[tuple[int,int]]]:
+
+        def find_index_ranges(values: list[int]) -> dict[int, list[tuple[int, int]]]:
             """
             For each bandit id, find the continuous ranges that this
             bandit was selected for.
@@ -115,6 +118,7 @@ class Metrics(ABC):
                 idx += 1
 
             return ranges
+
         ranges = find_index_ranges(values)
         print(ranges)
         fig, ax = plt.subplots()
@@ -125,32 +129,37 @@ class Metrics(ABC):
     def bandit_use_stackplot(self) -> None:
         num_simulations = self.bandit_collection.simulation_num
 
-        results_df = pd.DataFrame({
-        "pull_number": range(1, len(self.bandit_collection.results) + 1),
-        "id": [result["id"] for result in self.bandit_collection.results]
-        })
+        results_df = pd.DataFrame(
+            {
+                "pull_number": range(1, len(self.bandit_collection.results) + 1),
+                "id": [result["id"] for result in self.bandit_collection.results],
+            }
+        )
         results_df["cum_id"] = results_df.groupby("id").cumcount() + 1
-        results_df["cum_proportion"] = results_df["cum_id"]/results_df["pull_number"]
+        results_df["cum_proportion"] = results_df["cum_id"] / results_df["pull_number"]
         results_df = results_df.pivot_table("cum_id", "pull_number", "id").ffill()
         results_df = results_df.fillna(0)
-        results_df[results_df.columns]=results_df[results_df.columns].div(results_df.index, axis=0)
+        results_df[results_df.columns] = results_df[results_df.columns].div(
+            results_df.index, axis=0
+        )
         results_df = results_df.reset_index().drop(columns=["pull_number"])
 
-        plt.stackplot(range(num_simulations),
-                      results_df.to_dict(orient="list").values(),
-                      labels=self.bandit_collection.bandit_ids())
+        plt.stackplot(
+            range(num_simulations),
+            results_df.to_dict(orient="list").values(),
+            labels=self.bandit_collection.bandit_ids(),
+        )
         # TODO: Implement below if using epsilon_first
-        #plt.axvline(
+        # plt.axvline(
         #    x=100,
         #    color="black",
         #    linestyle="-",
         #    label="Cutoff",
-        #)
-        plt.legend(title="Bandit ID" ,loc="upper right")
+        # )
+        plt.legend(title="Bandit ID", loc="upper right")
         plt.xlabel("Pull Number")
         plt.ylabel("Proportion of Total Pulls")
         plt.show()
-
 
     def residual_barplots(
         self,
@@ -274,8 +283,8 @@ class OneParameterMetrics(Metrics):
                     "optimal bandit parameter true",
                     round(
                         self.bandit_collection.optimal_bandit.parameter,
-                        self.rounding_dp
-                    )
+                        self.rounding_dp,
+                    ),
                 ],
                 [
                     "optimal bandit parameter hat",
@@ -299,7 +308,7 @@ class OneParameterMetrics(Metrics):
         Generates plots to stdout of the multiarmed
         bandit simulation process.
         """
-        #self.bandit_use_timeseries
+        # self.bandit_use_timeseries
         self.bandit_use_stackplot()
         self.residual_barplots(
             true_parameters=self.bandit_collection.true_parameters,

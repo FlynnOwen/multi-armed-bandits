@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import StrEnum
 from functools import total_ordering
+from itertools import count
 from math import inf, sqrt
 from random import choice
-from itertools import count
 
 from numpy.random import binomial, normal
 
