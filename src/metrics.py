@@ -147,7 +147,11 @@ class Metrics(ABC):
         plt.stackplot(
             range(num_simulations),
             results_df.to_dict(orient="list").values(),
-            labels=self.bandit_collection.bandit_ids(),
+            labels=zip(self.bandit_collection.bandit_ids(),
+                       [round(param, self.rounding_dp)
+                        for param in self.bandit_collection.true_parameters],
+                       [round(param, self.rounding_dp)
+                        for param in self.bandit_collection.estimated_parameters])
         )
         # TODO: Implement below if using epsilon_first
         # plt.axvline(
@@ -156,9 +160,10 @@ class Metrics(ABC):
         #    linestyle="-",
         #    label="Cutoff",
         # )
-        plt.legend(title="Bandit ID", loc="upper right")
+        plt.legend(title="(ID, True Param, Param Hat)", loc="upper right")
         plt.xlabel("Pull Number")
         plt.ylabel("Proportion of Total Pulls")
+        plt.title("Share of Total Pulls by Bandit Over Time")
         plt.show()
 
     def residual_barplots(
