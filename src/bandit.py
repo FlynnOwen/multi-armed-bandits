@@ -6,6 +6,7 @@ from enum import StrEnum
 from functools import total_ordering
 from math import inf, sqrt
 from random import choice
+from itertools import count
 
 from numpy.random import binomial, normal
 
@@ -44,8 +45,10 @@ class Bandit(ABC):
     """
 
     num_parameters = 1
+    id_iter = count(start=1)
 
     def __init__(self, parameter: float) -> None:
+        self.id = next(self.id_iter)
         self.parameter = parameter
         self._results: list[float] = []
 
@@ -214,7 +217,7 @@ class BanditCollection:
     """
 
     bandits: list[Bandit]
-    results: list[int] = field(default_factory=list)
+    results: list[dict[int, float]] = field(default_factory=list)
     num_parameters: int = 1
 
     @classmethod
@@ -282,6 +285,12 @@ class BanditCollection:
     @property
     def residuals(self) -> list[float]:
         return [bandit.residual for bandit in self]
+
+    def bandit_ids(self, as_set: bool = False) -> list[Bandit] | set[Bandit]:
+        bandits = {bandit.id for bandit in self}
+        if as_set:
+            return bandits
+        return sorted(bandits)
 
 
 @dataclass
