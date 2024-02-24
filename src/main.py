@@ -1,14 +1,16 @@
 import json
+from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
-from enum import StrEnum
 
 import typer
 
-from src.bandit import (BanditCollection,
-                        TwoParameterBanditCollection,
-                        Distribution,
-                        distribution_factory)
+from src.bandit import (
+    BanditCollection,
+    Distribution,
+    TwoParameterBanditCollection,
+    distribution_factory,
+)
 from src.simulation import Strategy, strategy_factory
 
 app = typer.Typer()
@@ -30,7 +32,7 @@ def main(
     print_plots: bool,
     epsilon: float,
     decay_rate: float | None,
-    bandit_collection: BanditCollection
+    bandit_collection: BanditCollection,
 ) -> None:
     simulation = strategy_factory(
         strategy=strategy,
@@ -49,7 +51,7 @@ def main(
 
 
 @app.command()
-def simulate_fixed( #noqa
+def simulate_fixed(  # noqa
     strategy: Strategy = Strategy.epsilon_greedy,
     distribution: Distribution = Distribution.bernoulli,
     num_simulations: Annotated[int, typer.Option(min=10)] = 500,
@@ -69,13 +71,15 @@ def simulate_fixed( #noqa
             "Arg 'decay_rate' must be passed if using strategy" "'epsilon_first'."
         )
 
-    if (distribution in Distribution.two_parameter_family \
-        and parameter_two_values is None):
-        raise ValueError("'parameter_two_values' "
-                        "must be passed as args.")
+    if (
+        distribution in Distribution.two_parameter_family
+        and parameter_two_values is None
+    ):
+        raise ValueError("'parameter_two_values' " "must be passed as args.")
 
-    if distribution in Distribution.two_parameter_family and \
-        len(parameter_one_values) != len(parameter_two_values):
+    if distribution in Distribution.two_parameter_family and len(
+        parameter_one_values
+    ) != len(parameter_two_values):
         raise ValueError(
             "Length of parameter 'parameter_one_values' must be equal to "
             f"length of paramter 'parameter_two_values'. Got {len(parameter_one_values)} "
@@ -84,14 +88,15 @@ def simulate_fixed( #noqa
 
     num_parameters = distribution_factory(distribution).num_parameters
     if num_parameters == 1:
-        bandit_collection = (BanditCollection
-                            .from_parameter_list(distribution=distribution,
-                                                parameter_one_values=parameter_one_values))
+        bandit_collection = BanditCollection.from_parameter_list(
+            distribution=distribution, parameter_one_values=parameter_one_values
+        )
     if num_parameters == 2:
-        bandit_collection = (TwoParameterBanditCollection
-                            .from_parameter_list(distribution=distribution,
-                                                parameter_one_values=parameter_one_values,
-                                                parameter_two_values=parameter_two_values))
+        bandit_collection = TwoParameterBanditCollection.from_parameter_list(
+            distribution=distribution,
+            parameter_one_values=parameter_one_values,
+            parameter_two_values=parameter_two_values,
+        )
     main(
         strategy=strategy,
         num_simulations=num_simulations,
@@ -99,12 +104,12 @@ def simulate_fixed( #noqa
         print_plots=print_plots,
         epsilon=epsilon,
         decay_rate=decay_rate,
-        bandit_collection=bandit_collection
+        bandit_collection=bandit_collection,
     )
 
 
 @app.command()
-def simulate_generate( #noqa
+def simulate_generate(  # noqa
     parameter_one_mean: float,
     parameter_one_std: float,
     num_bandits: int = typer.Argument(min=2),
@@ -116,7 +121,7 @@ def simulate_generate( #noqa
     epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
     decay_rate: float = 0.05,
     parameter_two_mean: float = None,
-    parameter_two_std: float = None
+    parameter_two_std: float = None,
 ):
     """
     Run a simulation from a set of bandits
@@ -128,33 +133,39 @@ def simulate_generate( #noqa
             "Arg 'decay_rate' must be passed if using strategy" "'epsilon_first'."
         )
 
-    if (distribution in Distribution.two_parameter_family and (
-            parameter_two_mean is None or parameter_two_std is None
-            )):
-        raise ValueError("Either 'parameter_two_values' or "
-                        "'parameter_two_mean' and 'paramater_two_std' "
-                        "must be passed as args.")
+    if distribution in Distribution.two_parameter_family and (
+        parameter_two_mean is None or parameter_two_std is None
+    ):
+        raise ValueError(
+            "Either 'parameter_two_values' or "
+            "'parameter_two_mean' and 'paramater_two_std' "
+            "must be passed as args."
+        )
 
     if parameter_one_mean is None or parameter_one_std is None:
-        raise ValueError("Either 'parameter_one_values' or "
-                        "'parameter_one_mean' and 'paramater_one_std' "
-                        "must be passed as args.")
+        raise ValueError(
+            "Either 'parameter_one_values' or "
+            "'parameter_one_mean' and 'paramater_one_std' "
+            "must be passed as args."
+        )
 
     num_parameters = distribution_factory(distribution).num_parameters
     if num_parameters == 1:
-        bandit_collection = (BanditCollection
-                            .from_parameter_distribution(distribution=distribution,
-                                                        num_bandits=num_bandits,
-                                                        parameter_one_mean=parameter_one_mean,
-                                                        parameter_one_std=parameter_one_std))
+        bandit_collection = BanditCollection.from_parameter_distribution(
+            distribution=distribution,
+            num_bandits=num_bandits,
+            parameter_one_mean=parameter_one_mean,
+            parameter_one_std=parameter_one_std,
+        )
     elif num_parameters == 2:
-        bandit_collection = (TwoParameterBanditCollection
-                            .from_parameter_distribution(distribution=distribution,
-                                                        num_bandits=num_bandits,
-                                                        parameter_one_mean=parameter_one_mean,
-                                                        parameter_one_std=parameter_one_std,
-                                                        parameter_two_mean=parameter_two_mean,
-                                                        parameter_two_std=parameter_two_std))
+        bandit_collection = TwoParameterBanditCollection.from_parameter_distribution(
+            distribution=distribution,
+            num_bandits=num_bandits,
+            parameter_one_mean=parameter_one_mean,
+            parameter_one_std=parameter_one_std,
+            parameter_two_mean=parameter_two_mean,
+            parameter_two_std=parameter_two_std,
+        )
     main(
         strategy=strategy,
         num_simulations=num_simulations,
@@ -162,7 +173,7 @@ def simulate_generate( #noqa
         print_plots=print_plots,
         epsilon=epsilon,
         decay_rate=decay_rate,
-        bandit_collection=bandit_collection
+        bandit_collection=bandit_collection,
     )
 
 
@@ -185,8 +196,9 @@ def simulate_from_json(config: Path) -> None:
     elif bandit_gen_method == BanditGenMethod.from_dist.value:
         simulate_fixed(**simulation_args)
     else:
-        raise ValueError("Arg 'bandit_gen_method' must be one of"
-                         f"{BanditGenMethod.values}.")
+        raise ValueError(
+            "Arg 'bandit_gen_method' must be one of" f"{BanditGenMethod.values}."
+        )
 
 
 if __name__ == "__main__":

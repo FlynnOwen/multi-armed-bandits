@@ -45,7 +45,7 @@ class Bandit(ABC):
 
     num_parameters = 1
 
-    def __init__(self, parameter: float, **kwargs) -> None:
+    def __init__(self, parameter: float) -> None:
         self.parameter = parameter
         self._results: list[float] = []
 
@@ -105,7 +105,7 @@ class TwoParameterBandit(Bandit, ABC):
 
     num_parameters = 2
 
-    def __init__(self, parameter: float, secondary_parameter: float, **kwargs) -> None:
+    def __init__(self, parameter: float, secondary_parameter: float) -> None:
         super().__init__(parameter)
         self.secondary_parameter = secondary_parameter
 
@@ -130,12 +130,15 @@ class BernoulliBandit(Bandit):
     Single bandit, simulating over a Bernoulli distribution.
     """
 
-    def __init__(self, parameter: float, **kwargs) -> None:
+    def validate_parameter(self, parameter: float) -> None:
         if parameter < 0 or parameter > 1:
             raise ValueError(
                 f"parameter must be 0 <= parameter <= 1"
                 f"got value {parameter} instead."
             )
+
+    def __init__(self, parameter: float) -> None:
+        self.validate_parameter(parameter)
         super().__init__(parameter)
 
     def generate(self) -> float:
@@ -163,12 +166,15 @@ class GaussianBandit(TwoParameterBandit):
     Single bandit, simulating over a Gaussian distribution.
     """
 
-    def __init__(self, parameter: float, secondary_parameter: float, **kwargs) -> None:
+    def validate_parameter(self, secondary_parameter: float) -> None:
         if secondary_parameter < 0:
             raise ValueError(
                 "secondary_parameter must be < 0"
                 f"got value {secondary_parameter} instead."
             )
+
+    def __init__(self, parameter: float, secondary_parameter: float) -> None:
+        self.validate_parameter(secondary_parameter)
         super().__init__(parameter, secondary_parameter)
 
     def generate(self) -> float:
@@ -195,9 +201,10 @@ class GaussianBandit(TwoParameterBandit):
         """
         The estimated variance for this bandit.
         """
-        return sqrt(sum([(result - self.parameter_hat)**2 for result in self._results]) / len(
-            self._results
-        ))
+        return sqrt(
+            sum([(result - self.parameter_hat) ** 2 for result in self._results])
+            / len(self._results)
+        )
 
 
 @dataclass
@@ -211,10 +218,8 @@ class BanditCollection:
     num_parameters: int = 1
 
     @classmethod
-    def from_parameter_list( # noqa
-        cls,
-        distribution: Distribution,
-        parameter_one_values: list[float]
+    def from_parameter_list(  # noqa
+        cls, distribution: Distribution, parameter_one_values: list[float]
     ):
         """
         Constructor using list(s) of parameters and a bandit type.
@@ -224,24 +229,25 @@ class BanditCollection:
         return cls(bandits=bandits)
 
     @classmethod
-    def from_parameter_distribution( #noqa
+    def from_parameter_distribution(  # noqa
         cls,
         distribution: Distribution,
         num_bandits: int,
         parameter_one_mean: float,
-        parameter_one_std: float
+        parameter_one_std: float,
     ):
         """
         Constructor using and a bandit type,
         the number of bandits to generate, and the
         mean and std of each parameter.
         """
-        parameters = normal(loc=parameter_one_mean,
-                            scale=parameter_one_std,
-                            size=num_bandits).tolist()
+        parameters = normal(
+            loc=parameter_one_mean, scale=parameter_one_std, size=num_bandits
+        ).tolist()
 
-        return cls.from_parameter_list(distribution=distribution,
-                                       parameter_one_values=parameters)
+        return cls.from_parameter_list(
+            distribution=distribution, parameter_one_values=parameters
+        )
 
     def __iter__(self):  # noqa: ANN204
         return iter(self.bandits)
@@ -285,10 +291,11 @@ class TwoParameterBanditCollection(BanditCollection):
     where the armed bandits are of a two-parameter
     distribution.
     """
+
     num_parameters: int = 2
 
     @classmethod
-    def from_parameter_list( # noqa
+    def from_parameter_list(  # noqa
         cls,
         distribution: Distribution,
         parameter_one_values: list[float],
@@ -307,31 +314,32 @@ class TwoParameterBanditCollection(BanditCollection):
         return cls(bandits=bandits)
 
     @classmethod
-    def from_parameter_distribution( #noqa
+    def from_parameter_distribution(  # noqa
         cls,
         distribution: Distribution,
         num_bandits: int,
         parameter_one_mean: float,
         parameter_one_std: float,
         parameter_two_mean: float,
-        parameter_two_std: float
+        parameter_two_std: float,
     ):
         """
         Constructor using and a bandit type,
         the number of bandits to generate, and the
         mean and std of each parameter.
         """
-        parameters = normal(loc=parameter_one_mean,
-                            scale=parameter_one_std,
-                            size=num_bandits).tolist()
-        secondary_parameters = normal(loc=parameter_two_mean,
-                                        scale=parameter_two_std,
-                                        size=num_bandits).tolist()
+        parameters = normal(
+            loc=parameter_one_mean, scale=parameter_one_std, size=num_bandits
+        ).tolist()
+        secondary_parameters = normal(
+            loc=parameter_two_mean, scale=parameter_two_std, size=num_bandits
+        ).tolist()
 
-        return cls.from_parameter_list(distribution=distribution,
-                                       parameter_one_values=parameters,
-                                       parameter_two_values=secondary_parameters)
-
+        return cls.from_parameter_list(
+            distribution=distribution,
+            parameter_one_values=parameters,
+            parameter_two_values=secondary_parameters,
+        )
 
     @property
     def true_secondary_parameters(self) -> list[float]:
