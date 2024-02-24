@@ -178,7 +178,8 @@ def simulate_generate(  # noqa
 
 
 @app.command()
-def simulate_from_json(config: Path) -> None:
+def simulate_from_json(config: str,
+                       bandit_gen_method: BanditGenMethod) -> None:
     """
     Runs a multi-armed bandit simulation with
     configuration (arguments) provided via a json
@@ -186,18 +187,19 @@ def simulate_from_json(config: Path) -> None:
 
     TODO: Create example json schema.
     """
+    config = Path(config)
     if not config.is_file() and config.suffix != ".json":
         raise ValueError("config must be suffixed with '.json'.")
-    simulation_args = json.load(config)
+    with Path.open(config) as config_file:
+        simulation_args = json.load(config_file)
 
-    bandit_gen_method = config.pop("bandit_gen_method")
     if bandit_gen_method == BanditGenMethod.from_dist.value:
         simulate_generate(**simulation_args)
-    elif bandit_gen_method == BanditGenMethod.from_dist.value:
+    elif bandit_gen_method == BanditGenMethod.from_list.value:
         simulate_fixed(**simulation_args)
     else:
         raise ValueError(
-            "Arg 'bandit_gen_method' must be one of" f"{BanditGenMethod.values}."
+            "Arg 'bandit_gen_method' must be one of" f"{BanditGenMethod.values()}."
         )
 
 

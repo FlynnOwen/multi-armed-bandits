@@ -39,3 +39,4 @@ venv/
 
 # Development
 *.ipynb
+config/test_schema.json
