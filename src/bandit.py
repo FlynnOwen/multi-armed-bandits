@@ -131,7 +131,7 @@ class BernoulliBandit(Bandit):
     """
 
     def __init__(self, parameter: float, **kwargs) -> None:
-        if 0 > parameter < 1:
+        if parameter < 0 or parameter > 1:
             raise ValueError(
                 f"parameter must be 0 <= parameter <= 1"
                 f"got value {parameter} instead."
@@ -208,26 +208,19 @@ class BanditCollection:
 
     bandits: list[Bandit]
     results: list[int] = field(default_factory=list)
+    num_parameters: int = 1
 
     @classmethod
     def from_parameter_list( # noqa
         cls,
         distribution: Distribution,
-        parameter_one_values: list[float],
-        parameter_two_values: list[float] | None,
+        parameter_one_values: list[float]
     ):
         """
         Constructor using list(s) of parameters and a bandit type.
         """
         bandit_type = distribution_factory(distribution=distribution)
-        if distribution in Distribution.one_parameter_family:
-            bandits = [bandit_type(parameter) for parameter in parameter_one_values]
-        else:
-            bandits = [
-                bandit_type(parameter_one_values[i], parameter_two_values[i])
-                for i in range(len(parameter_one_values))
-            ]
-
+        bandits = [bandit_type(parameter) for parameter in parameter_one_values]
         return cls(bandits=bandits)
 
     @classmethod
@@ -236,9 +229,7 @@ class BanditCollection:
         distribution: Distribution,
         num_bandits: int,
         parameter_one_mean: float,
-        parameter_one_std: float,
-        parameter_two_mean: float | None,
-        parameter_two_std: float | None
+        parameter_one_std: float
     ):
         """
         Constructor using and a bandit type,
@@ -247,20 +238,10 @@ class BanditCollection:
         """
         parameters = normal(loc=parameter_one_mean,
                             scale=parameter_one_std,
-                            size=num_bandits).to_list()
-        if distribution in Distribution.two_parameter_family:
-            secondary_parameters = normal(loc=parameter_two_mean,
-                                          scale=parameter_two_std,
-                                          size=num_bandits).to_list()
-        else:
-            secondary_parameters = None
+                            size=num_bandits).tolist()
 
-        return cls.from_parameter_list(distribution=Distribution,
-                                       parameter_one_values=parameters,
-                                       parameter_two_values=secondary_parameters)
-
-    def __post_init__(self):
-        self.num_parameters = self.random_bandit.num_parameters
+        return cls.from_parameter_list(distribution=distribution,
+                                       parameter_one_values=parameters)
 
     def __iter__(self):  # noqa: ANN204
         return iter(self.bandits)
@@ -296,23 +277,70 @@ class BanditCollection:
     def residuals(self) -> list[float]:
         return [bandit.residual for bandit in self]
 
+
+@dataclass
+class TwoParameterBanditCollection(BanditCollection):
+    """
+    Container class for a collection of armed bandits,
+    where the armed bandits are of a two-parameter
+    distribution.
+    """
+    num_parameters: int = 2
+
+    @classmethod
+    def from_parameter_list( # noqa
+        cls,
+        distribution: Distribution,
+        parameter_one_values: list[float],
+        parameter_two_values: list[float],
+    ):
+        """
+        Constructor using list(s) of parameters and a bandit type.
+        """
+        bandit_type = distribution_factory(distribution=distribution)
+
+        bandits = [
+            bandit_type(parameter_one_values[i], parameter_two_values[i])
+            for i in range(len(parameter_one_values))
+        ]
+
+        return cls(bandits=bandits)
+
+    @classmethod
+    def from_parameter_distribution( #noqa
+        cls,
+        distribution: Distribution,
+        num_bandits: int,
+        parameter_one_mean: float,
+        parameter_one_std: float,
+        parameter_two_mean: float,
+        parameter_two_std: float
+    ):
+        """
+        Constructor using and a bandit type,
+        the number of bandits to generate, and the
+        mean and std of each parameter.
+        """
+        parameters = normal(loc=parameter_one_mean,
+                            scale=parameter_one_std,
+                            size=num_bandits).tolist()
+        secondary_parameters = normal(loc=parameter_two_mean,
+                                        scale=parameter_two_std,
+                                        size=num_bandits).tolist()
+
+        return cls.from_parameter_list(distribution=distribution,
+                                       parameter_one_values=parameters,
+                                       parameter_two_values=secondary_parameters)
+
+
     @property
     def true_secondary_parameters(self) -> list[float]:
-        if self.num_parameters == 1:
-            raise ValueError("Distribution requires >= 2 values to "
-                             "access secondary parameters")
         return [bandit.secondary_parameter for bandit in self]
 
     @property
     def estimated_secondary_parameters(self) -> list[float]:
-        if self.num_parameters == 1:
-            raise ValueError("Distribution requires >= 2 values to "
-                             "access secondary parameters")
         return [bandit.secondary_parameter_hat for bandit in self]
 
     @property
     def secondary_residuals(self) -> list[float]:
-        if self.num_parameters == 1:
-            raise ValueError("Distribution requires >= 2 values to "
-                             "access secondary parameters")
         return [bandit.secondary_residual for bandit in self]
