@@ -1,0 +1,9 @@
+{
+    "strategy": "epsilon_greedy",
+    "distribution": "bernoulli",
+    "num_simulations": 500,
+    "print_metrics": true,
+    "print_plots": true,
+    "epsilon": 0.2,
+    "parameter_one_values": [0.5, 0.5, 0.5, 0.5, 0.5, 0.9]
+}
