@@ -1,0 +1,13 @@
+{
+    "parameter_one_mean": 10,
+    "parameter_one_std": 1,
+    "num_bandits": 8,
+    "strategy": "epsilon_greedy",
+    "distribution": "gaussian",
+    "num_simulations": 500,
+    "print_metrics": true,
+    "print_plots": true,
+    "epsilon": 0.2,
+    "parameter_two_mean": 1,
+    "parameter_two_std": 0.5
+}
