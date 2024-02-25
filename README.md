@@ -1,5 +1,5 @@
 <h1 align="center">
-multi-armed-bandits
+Multi Armed Bandits (MAB).
 </h1>
 
 <p>
