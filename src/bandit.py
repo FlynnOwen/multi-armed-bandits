@@ -25,6 +25,10 @@ class Distribution(StrEnum):
     def two_parameter_family(cls):  # noqa: ANN206
         return {cls.gaussian}
 
+    @classmethod
+    def values(cls) -> list[str]:
+        return [c.value for c in cls]
+
 
 def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
     distribution_map = {

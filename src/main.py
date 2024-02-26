@@ -203,5 +203,10 @@ def simulate_from_json(config: str,
         )
 
 
+@app.command()
+def list_distributions() -> list[str]:
+    return Distribution.values
+
+
 if __name__ == "__main__":
     app()

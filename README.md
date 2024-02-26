@@ -14,6 +14,34 @@ About
 Usage
 </h2>
 
+Options exist for simulating both directly using the command line, or via passing a configuration file in the form of JSON. The second is recommended for reproducable simulation studies.
+
+There are a number of different distributions available. To view them, run:
+
+```bash
+just list-distributions
+```
+
+<h4 align="center">
+Simulating directly
+</h4>
+
+<p align="center">
+```bash
+just 
+```
+</p>
+
+<h4 align="center">
+Simulating from config (json) file
+</h4>
+
+<p align="center">
+```bash
+just 
+```
+</p>
+
 <p align="center">
 <img width="400" height="150" src="img/sim_metrics.png"/>
 <img width="400" height="300" src="img/sim_pulls.png"/>
