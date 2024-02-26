@@ -10,6 +10,11 @@ Multi-Armed Bandit method of accurately estimating the largest parameter out of 
 About
 </h2>
 
+
+The multi-armed bandit problem is a classic dilemma in probability theory and decision-making, often used to model situations where one must balance exploration (trying new options) and exploitation (leveraging known options). The name "multi-armed bandit" originates from the analogy of a gambler facing multiple slot machines (bandits), each with potentially different payoff probabilities. The objective is to maximize cumulative reward over time while facing uncertainty about which action (or bandit arm) yields the highest reward.
+
+In its basic form, a player repeatedly chooses from a set of arms, each with an unknown reward distribution, and receives a stochastic reward associated with the chosen arm. The challenge lies in deciding which arm to pull at each step to maximize cumulative reward, taking into account the trade-off between exploring new arms to gather information and exploiting arms with potentially higher expected rewards based on current knowledge.
+
 <h2  align="center">
 Usage
 </h2>
