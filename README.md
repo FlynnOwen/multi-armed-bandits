@@ -19,10 +19,7 @@ Usage
 <img width="400" height="300" src="img/sim_pulls.png"/>
 </p>
 
-<p align="left">
+<p align="center">
 <img width="400" height="300" src="img/sim_reward.png"/>
-</p>
-
-<p align="right">
 <img width="400" height="300" src="img/sim_residuals.png"/>
 </p>
