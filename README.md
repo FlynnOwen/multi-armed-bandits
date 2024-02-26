@@ -14,11 +14,8 @@ About
 Usage
 </h2>
 
-<p align="left">
+<p align="center">
 <img width="400" height="150" src="img/sim_metrics.png"/>
-</p>
-
-<p align="left">
 <img width="400" height="300" src="img/sim_pulls.png"/>
 </p>
 
