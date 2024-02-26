@@ -27,8 +27,9 @@ Simulating directly
 </h4>
 
 <p align="center">
+
 ```bash
-just 
+just
 ```
 </p>
 
