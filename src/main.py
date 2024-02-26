@@ -205,7 +205,13 @@ def simulate_from_json(config: str,
 
 @app.command()
 def list_distributions() -> list[str]:
-    return Distribution.values
+    one_parameter = {dist.value for dist in Distribution.one_parameter_family}
+    two_parameter = {dist.value for dist in Distribution.two_parameter_family}
+
+    print("One Parameter Distributions: \n"  #noqa
+          f"{one_parameter} \n \n"
+          "Two Parameter Distributions: \n"
+          f"{two_parameter}")
 
 
 if __name__ == "__main__":

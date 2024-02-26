@@ -29,3 +29,7 @@ lint:
 format:
     just lint
     ruff format .
+
+# Usage
+list-distributions:
+    python3 -m src.main list-distributions

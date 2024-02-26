@@ -16,7 +16,7 @@ Usage
 
 Options exist for simulating both directly using the command line, or via passing a configuration file in the form of JSON. The second is recommended for reproducable simulation studies.
 
-There are a number of different distributions available. To view them, run:
+To view possible distributions, and information about their associated parameters, run:
 
 ```bash
 just list-distributions
