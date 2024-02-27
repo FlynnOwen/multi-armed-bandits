@@ -49,7 +49,7 @@ just
 ```
 </p>
 
-<p align="center>
+<p align="center">
 <img width="400" height="150" src="img/sim_metrics.png"/>
 </p>
 
