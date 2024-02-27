@@ -49,8 +49,12 @@ just
 ```
 </p>
 
-<p align="center">
+<p align="center>
 <img width="400" height="150" src="img/sim_metrics.png"/>
+</p>
+
+<p align="center">
+<img width="400" height="300" src="img/sim_cum_reward.png"/>
 <img width="400" height="300" src="img/sim_pulls.png"/>
 </p>
 
