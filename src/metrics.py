@@ -238,6 +238,41 @@ class Metrics(ABC):
         plt.legend()
         plt.show()
 
+    def cumulative_reward_timeseries_plot(self) -> None:
+        """
+        Generates a timeseries plot of the cumulative reward
+        recieved during each stage of the simulation process.
+
+        This includes lines of expected cumulatove reward over all
+        bandits, as well as best and worst parameters.
+        """
+        best_expected_parameter = np.max(self.bandit_collection.true_parameters)
+        worst_expected_parameter = np.min(self.bandit_collection.true_parameters)
+        avg_expected_parameter =  np.mean(self.bandit_collection.true_parameters)
+
+        cumulative_rewards = pd.DataFrame({
+            "True Cumulative Reward": list(np.cumsum([result["value"]
+                                                      for result
+                                                      in self.bandit_collection.results])),
+            "Expected Average Reward": [avg_expected_parameter * sim
+                                        for sim
+                                        in range(self.num_simulations)],
+            "Expected Best Reward": [best_expected_parameter * sim
+                                        for sim
+                                        in range(self.num_simulations)],
+            "Expected Worst Reward": [worst_expected_parameter * sim
+                                        for sim
+                                        in range(self.num_simulations)]
+                                        })
+        ax = sns.lineplot(data=cumulative_rewards)
+
+        ax.set(title="Simulation Cumulative Reward",
+               xlabel="Simulation Number",
+               ylabel="Cumulative Reward")
+
+        plt.legend()
+        plt.show()
+
     @abstractmethod
     def generate_plots(self) -> None:
         """
@@ -287,7 +322,6 @@ class OneParameterMetrics(Metrics):
         Generates plots to stdout of the multiarmed
         bandit simulation process.
         """
-        # self.bandit_use_timeseries
         self.bandit_use_stackplot()
         self.residual_barplots(
             true_parameters=self.bandit_collection.true_parameters,
@@ -295,6 +329,7 @@ class OneParameterMetrics(Metrics):
             parameter_type=ParameterType.primary,
         )
         self.reward_timeseries_plot()
+        self.cumulative_reward_timeseries_plot()
 
 
 @dataclass
@@ -371,3 +406,4 @@ class TwoParameterMetrics(Metrics):
             parameter_type=ParameterType.secondary,
         )
         self.reward_timeseries_plot()
+        self.cumulative_reward_timeseries_plot()
