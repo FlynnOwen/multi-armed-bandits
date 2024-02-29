@@ -1,4 +1,5 @@
 from math import log, sqrt
+from enum import StrEnum
 
 
 def ucb(q: float, t: int, c: float, q_t: int) -> float:
@@ -14,3 +15,10 @@ def ucb(q: float, t: int, c: float, q_t: int) -> float:
     q_t: The number of times the best bandit has been pulled.
     """
     return q + (c * sqrt(log(t) / q_t))
+
+
+class ExtStrEnum(StrEnum):
+
+    @classmethod
+    def values(cls) -> list[str]:
+        return {c.value for c in cls}

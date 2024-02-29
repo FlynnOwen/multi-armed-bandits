@@ -7,33 +7,36 @@ from functools import total_ordering
 from itertools import count
 from math import inf, sqrt
 from random import choice
+from numpy.random import (
+    binomial,
+    normal,
+    poisson
+)
 
-from numpy.random import binomial, normal
 
+from src.utils.utils import ExtStrEnum
 
-class Distribution(StrEnum):
+class Distribution(ExtStrEnum):
     bernoulli = "bernoulli"
     gaussian = "gaussian"
+    poisson = "poisson"
 
     @classmethod
     @property
     def one_parameter_family(cls):  # noqa: ANN206
-        return {cls.bernoulli}
+        return {cls.bernoulli, cls.poisson}
 
     @classmethod
     @property
     def two_parameter_family(cls):  # noqa: ANN206
         return {cls.gaussian}
 
-    @classmethod
-    def values(cls) -> list[str]:
-        return [c.value for c in cls]
-
 
 def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
     distribution_map = {
         Distribution.bernoulli: BernoulliBandit,
         Distribution.gaussian: GaussianBandit,
+        Distribution.poisson: PoissonBandit,
     }
 
     return distribution_map[distribution]
@@ -213,6 +216,44 @@ class GaussianBandit(TwoParameterBandit):
             / len(self._results)
         )
 
+
+class PoissonBandit(Bandit):
+    """
+    Single bandit, simulating over a Poisson distribution.
+    """
+
+    def validate_parameter(self, parameter: float) -> None:
+        if parameter < 0:
+            raise ValueError(
+                f"parameter must be >= 0 got value {parameter} instead."
+            )
+        if not isinstance(parameter, int):
+            raise ValueError(
+                f"parameter must be of type integer."
+            )
+
+    def __init__(self, parameter: float) -> None:
+        self.validate_parameter(parameter)
+        super().__init__(parameter)
+
+    def generate(self) -> float:
+        """
+        Generates a single result from the pull of the
+        armed bandit.
+        """
+        result = poisson(lam=self.parameter)
+        self._results.append(result)
+
+        return result
+
+    @property
+    def parameter_hat(self) -> float:
+        """
+        The estimated theta for this bandit.
+        """
+        if not self._results:
+            return inf
+        return sum(self._results) / len(self._results)
 
 @dataclass
 class BanditCollection:

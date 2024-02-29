@@ -1,5 +1,4 @@
 import json
-from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
 
@@ -12,17 +11,14 @@ from src.bandit import (
     distribution_factory,
 )
 from src.simulation import Strategy, strategy_factory
+from src.utils.utils import ExtStrEnum
 
 app = typer.Typer()
 
 
-class BanditGenMethod(StrEnum):
+class BanditGenMethod(ExtStrEnum):
     from_list = "from_list"
     from_dist = "from_distribution"
-
-    @classmethod
-    def values(cls) -> list[str]:
-        return [c.value for c in cls]
 
 
 def main(
