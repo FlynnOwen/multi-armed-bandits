@@ -12,9 +12,8 @@ from numpy.random import (
     normal,
     poisson
 )
-
-
 from src.utils.utils import ExtStrEnum
+
 
 class Distribution(ExtStrEnum):
     bernoulli = "bernoulli"
