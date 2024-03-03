@@ -19,11 +19,6 @@ from src.utils.utils import ExtStrEnum
 app = typer.Typer()
 
 
-class BanditGenMethod(ExtStrEnum):
-    from_list = "from_list"
-    from_dist = "from_distribution"
-
-
 class CLICommands(ExtStrEnum):
     ONE_PARAM_FIXED = "simulate-one-param-fixed"
     TWO_PARAM_FIXED = "simulate-two-param-fixed"
@@ -78,6 +73,7 @@ class CLICommand(ABC):
 class OneParamFixed(CLICommand):
     command_name = "simulate-one-param-fixed"
 
+    @staticmethod
     @app.command(command_name)
     def cli_command(strategy: Strategy = Strategy.epsilon_greedy,  # noqa
                     distribution: OneParamDistribution = OneParamDistribution.bernoulli,
@@ -109,6 +105,7 @@ class OneParamFixed(CLICommand):
 class TwoParamFixed(CLICommand):
     command_name = "simulate-two-param-fixed"
 
+    @staticmethod
     @app.command(command_name)
     def cli_command(strategy: Strategy = Strategy.epsilon_greedy, #noqa
                     distribution: TwoParamDistribution = TwoParamDistribution.gaussian,
@@ -150,6 +147,7 @@ class TwoParamFixed(CLICommand):
 class OneParamGen(CLICommand):
     command_name = "simulate-one-param-generate"
 
+    @staticmethod
     @app.command(command_name)
     def cli_command(parameter_one_mean: float,  # noqa
                     parameter_one_std: float,
@@ -193,6 +191,7 @@ class OneParamGen(CLICommand):
 class TwoParamGen(CLICommand):
     command_name = "simulate-two-param-generate"
 
+    @staticmethod
     @app.command(command_name)
     def cli_command(parameter_one_mean: float, #noqa
                     parameter_one_std: float,
@@ -249,7 +248,7 @@ def simulate_from_json(
         simulation_args = json.load(config_file)
 
     sim_command = CLICommands.command_factory(value=command)
-    sim_command(**simulation_args).cli_command()
+    sim_command().cli_command(**simulation_args)
 
 
 @app.command()
