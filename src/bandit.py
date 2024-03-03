@@ -2,40 +2,34 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from enum import StrEnum
 from functools import total_ordering
 from itertools import count
 from math import inf, sqrt
 from random import choice
+from typing import NewType
 from numpy.random import (
     binomial,
     normal,
     poisson
 )
+
 from src.utils.utils import ExtStrEnum
 
 
-class Distribution(ExtStrEnum):
+class OneParamDistribution(ExtStrEnum):
     bernoulli = "bernoulli"
-    gaussian = "gaussian"
     poisson = "poisson"
 
-    @classmethod
-    @property
-    def one_parameter_family(cls):  # noqa: ANN206
-        return {cls.bernoulli, cls.poisson}
 
-    @classmethod
-    @property
-    def two_parameter_family(cls):  # noqa: ANN206
-        return {cls.gaussian}
+class TwoParamDistribution(ExtStrEnum):
+    gaussian = "gaussian"
 
 
-def distribution_factory(distribution: Distribution) -> Bandit:  # noqa: ANN003
+def distribution_factory(distribution: OneParamDistribution | TwoParamDistribution) -> Bandit:  # noqa: ANN003
     distribution_map = {
-        Distribution.bernoulli: BernoulliBandit,
-        Distribution.gaussian: GaussianBandit,
-        Distribution.poisson: PoissonBandit,
+        OneParamDistribution.bernoulli: BernoulliBandit,
+        OneParamDistribution.poisson: PoissonBandit,
+        TwoParamDistribution.gaussian: GaussianBandit,
     }
 
     return distribution_map[distribution]
@@ -266,7 +260,7 @@ class BanditCollection:
 
     @classmethod
     def from_parameter_list(  # noqa
-        cls, distribution: Distribution, parameter_one_values: list[float]
+        cls, distribution: OneParamDistribution, parameter_one_values: list[float]
     ):
         """
         Constructor using list(s) of parameters and a bandit type.
@@ -278,7 +272,7 @@ class BanditCollection:
     @classmethod
     def from_parameter_distribution(  # noqa
         cls,
-        distribution: Distribution,
+        distribution: OneParamDistribution,
         num_bandits: int,
         parameter_one_mean: float,
         parameter_one_std: float,
@@ -350,7 +344,7 @@ class TwoParameterBanditCollection(BanditCollection):
     @classmethod
     def from_parameter_list(  # noqa
         cls,
-        distribution: Distribution,
+        distribution: TwoParamDistribution,
         parameter_one_values: list[float],
         parameter_two_values: list[float],
     ):
@@ -369,7 +363,7 @@ class TwoParameterBanditCollection(BanditCollection):
     @classmethod
     def from_parameter_distribution(  # noqa
         cls,
-        distribution: Distribution,
+        distribution: TwoParamDistribution,
         num_bandits: int,
         parameter_one_mean: float,
         parameter_one_std: float,

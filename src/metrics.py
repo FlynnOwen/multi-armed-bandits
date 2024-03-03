@@ -120,8 +120,7 @@ class Metrics(ABC):
             return ranges
 
         ranges = find_index_ranges(values)
-        print(ranges)
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
         for k, v in ranges.items():
             ax.broken_barh(v, yrange=(k, 1))
         plt.show()
@@ -307,10 +306,10 @@ class OneParameterMetrics(Metrics):
                         self.rounding_dp,
                     ),
                 ],
-                ["total simulations", self.num_simulations],
-                ["total reward", self.total_reward],
-                ["mape", self.mape],
-                ["mae", self.mae],
+                ["total simulations", round(self.num_simulations, self.rounding_dp)],
+                ["total reward", round(self.total_reward, self.rounding_dp)],
+                ["mape", round(self.mape, self.rounding_dp)],
+                ["mae", round(self.mae, self.rounding_dp)],
             ],
             headers=["metric", "value"],
             tablefmt="rounded_outline",
@@ -357,7 +356,8 @@ class TwoParameterMetrics(Metrics):
             [
                 [
                     "optimal bandit parameter true",
-                    self.bandit_collection.optimal_bandit.parameter,
+                    round(self.bandit_collection.optimal_bandit.parameter,
+                          self.rounding_dp)
                 ],
                 [
                     "optimal bandit parameter hat",
@@ -368,7 +368,8 @@ class TwoParameterMetrics(Metrics):
                 ],
                 [
                     "optimal bandit secondary parameter true",
-                    self.bandit_collection.optimal_bandit.secondary_parameter,
+                    round(self.bandit_collection.optimal_bandit.secondary_parameter,
+                          self.rounding_dp)
                 ],
                 [
                     "optimal bandit secondary parameter hat",
@@ -377,12 +378,12 @@ class TwoParameterMetrics(Metrics):
                         self.rounding_dp,
                     ),
                 ],
-                ["total simulations", self.num_simulations],
-                ["total reward", self.total_reward],
-                ["mape", self.mape],
-                ["mae", self.mae],
-                ["secondary mape", self.secondary_mape],
-                ["secondary mae", self.secondary_mae],
+                ["total simulations", round(self.num_simulations, self.rounding_dp)],
+                ["total reward", round(self.total_reward, self.rounding_dp)],
+                ["mape", round(self.mape, self.rounding_dp)],
+                ["mae", round(self.mae, self.rounding_dp)],
+                ["secondary mape", round(self.secondary_mape, self.rounding_dp)],
+                ["secondary mae", round(self.secondary_mae, self.rounding_dp)],
             ],
             headers=["metric", "value"],
             tablefmt="rounded_outline",
