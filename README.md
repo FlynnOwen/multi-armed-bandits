@@ -21,6 +21,21 @@ Usage
 
 Options exist for simulating both directly using the command line, or via passing a configuration file in the form of JSON. The second is recommended for reproducable simulation studies.
 
+To see all possible simulation commands run
+```bash
+just help
+```
+
+or help for a specific command:
+```bash
+just {{COMMAND}} help
+```
+
+e.g:
+```bash
+just list-distributions help
+```
+
 To view possible distributions, and information about their associated parameters, run:
 
 ```bash
@@ -33,9 +48,14 @@ Simulating directly
 
 <p align="center">
 
+To run a simulation by passing arguments directly, run:
+
 ```bash
-just
+just {{COMMAND}} {{*ARGS}}
 ```
+
+Where `COMMAND` is a command returned from `just help`, and args are those required
+by a specific command upon running `just {{COMMAND}} help`.
 </p>
 
 <h4 align="center">
@@ -44,10 +64,17 @@ Simulating from config (json) file
 
 <p align="center">
 
+There is the option to perform a MAB simulation, reading arguments and configuration from a config file.
+To perform this simulation, run:
+
 ```bash
-just 
+just simulate-from-json {{COMMAND}} {{CONFIG}}
 ```
 </p>
+
+<h4 align="center">
+Sample Outputs
+</h4>
 
 <p align="center">
 <img width="400" height="150" src="img/sim_metrics.png"/>

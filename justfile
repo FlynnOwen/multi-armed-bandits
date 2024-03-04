@@ -36,3 +36,9 @@ simulate-from-json COMMAND CONFIG: pyenv-activate
 # Usage
 list-distributions:
     python3 -m src.main list-distributions
+
+help *ARGS:
+    python3 -m src.main {{ARGS}} --help
+
+run COMMAND *ARGS:
+    python3 -m src.main --{{COMMAND}} {{ARGS}}
