@@ -30,6 +30,9 @@ format:
     just lint
     ruff format .
 
+simulate-from-json COMMAND CONFIG: pyenv-activate
+    python3 -m src.main simulate-from-json {{COMMAND}} {{CONFIG}}
+
 # Usage
 list-distributions:
     python3 -m src.main list-distributions
