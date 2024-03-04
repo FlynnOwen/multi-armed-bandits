@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 import json
+from abc import ABC, abstractmethod, abstractproperty
 from pathlib import Path
 from typing import Annotated
-from abc import ABC, abstractmethod, abstractproperty
 
 import typer
 
 from src.bandit import (
+    BanditCollection,
     OneParamDistribution,
     TwoParamDistribution,
-    BanditCollection,
-    TwoParameterBanditCollection
+    TwoParameterBanditCollection,
 )
 from src.simulation import Strategy, strategy_factory
 from src.utils.utils import ExtStrEnum
@@ -31,19 +31,20 @@ class CLICommands(ExtStrEnum):
             cls.ONE_PARAM_FIXED: OneParamFixed,
             cls.TWO_PARAM_FIXED: TwoParamFixed,
             cls.ONE_PARAM_GEN: OneParamGen,
-            cls.TWO_PARAM_GEN: TwoParamGen
-         }.get(value)
+            cls.TWO_PARAM_GEN: TwoParamGen,
+        }.get(value)
 
 
-def run_simulation(strategy: Strategy,
-                   num_simulations: int,
-                   print_metrics: bool,
-                   print_plots: bool,
-                   epsilon: float,
-                   decay_rate: float | None,
-                   bandit_collection: BanditCollection) -> None:
-
-        simulation = strategy_factory(
+def run_simulation(
+    strategy: Strategy,
+    num_simulations: int,
+    print_metrics: bool,
+    print_plots: bool,
+    epsilon: float,
+    decay_rate: float | None,
+    bandit_collection: BanditCollection,
+) -> None:
+    simulation = strategy_factory(
         strategy=strategy,
         bandit_collection=bandit_collection,
         num_simulations=num_simulations,
@@ -51,15 +52,15 @@ def run_simulation(strategy: Strategy,
         decay_rate=decay_rate,  # HACK: This parameter should only be passed to some strategies. # noqa: E501
     )
 
-        simulation.full_simulation()
+    simulation.full_simulation()
 
-        if print_plots:
-            simulation.metrics.generate_plots()
-        if print_metrics:
-            print(simulation.metrics)  # noqa: T201
+    if print_plots:
+        simulation.metrics.generate_plots()
+    if print_metrics:
+        print(simulation.metrics)  # noqa: T201
+
 
 class CLICommand(ABC):
-
     @abstractproperty
     def command_name(self) -> str:
         pass
@@ -75,14 +76,16 @@ class OneParamFixed(CLICommand):
 
     @staticmethod
     @app.command(command_name)
-    def cli_command(strategy: Strategy = Strategy.epsilon_greedy,  # noqa
-                    distribution: OneParamDistribution = OneParamDistribution.bernoulli,
-                    num_simulations: Annotated[int, typer.Option(min=10)] = 500,
-                    print_metrics: bool = False,
-                    print_plots: bool = False,
-                    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
-                    decay_rate: float = 0.05,
-                    parameter_one_values: list[float] = None) -> None:
+    def cli_command(
+        strategy: Strategy = Strategy.epsilon_greedy,  # noqa
+        distribution: OneParamDistribution = OneParamDistribution.bernoulli,
+        num_simulations: Annotated[int, typer.Option(min=10)] = 500,
+        print_metrics: bool = False,
+        print_plots: bool = False,
+        epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
+        decay_rate: float = 0.05,
+        parameter_one_values: list[float] = None,
+    ) -> None:
         """
         Run a simulation from a fixed set of bandit
         parameters.
@@ -107,16 +110,17 @@ class TwoParamFixed(CLICommand):
 
     @staticmethod
     @app.command(command_name)
-    def cli_command(strategy: Strategy = Strategy.epsilon_greedy, #noqa
-                    distribution: TwoParamDistribution = TwoParamDistribution.gaussian,
-                    num_simulations: Annotated[int, typer.Option(min=10)] = 500,
-                    print_metrics: bool = False,
-                    print_plots: bool = False,
-                    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
-                    decay_rate: float = 0.05,
-                    parameter_one_values: list[float] = None,
-                    parameter_two_values: list[float] = None,
-                ) -> None:
+    def cli_command(
+        strategy: Strategy = Strategy.epsilon_greedy,  # noqa
+        distribution: TwoParamDistribution = TwoParamDistribution.gaussian,
+        num_simulations: Annotated[int, typer.Option(min=10)] = 500,
+        print_metrics: bool = False,
+        print_plots: bool = False,
+        epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
+        decay_rate: float = 0.05,
+        parameter_one_values: list[float] = None,
+        parameter_two_values: list[float] = None,
+    ) -> None:
         """
         Run a simulation from a fixed set of bandit
         parameters.
@@ -149,16 +153,18 @@ class OneParamGen(CLICommand):
 
     @staticmethod
     @app.command(command_name)
-    def cli_command(parameter_one_mean: float,  # noqa
-                    parameter_one_std: float,
-                    num_bandits: int = typer.Argument(min=2),
-                    strategy: Strategy = Strategy.epsilon_greedy,
-                    distribution: OneParamDistribution = OneParamDistribution.bernoulli,
-                    num_simulations: Annotated[int, typer.Option(min=10)] = 500,
-                    print_metrics: bool = False,
-                    print_plots: bool = False,
-                    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
-                    decay_rate: float = 0.05) -> None:
+    def cli_command(
+        parameter_one_mean: float,  # noqa
+        parameter_one_std: float,
+        num_bandits: int = typer.Argument(min=2),
+        strategy: Strategy = Strategy.epsilon_greedy,
+        distribution: OneParamDistribution = OneParamDistribution.bernoulli,
+        num_simulations: Annotated[int, typer.Option(min=10)] = 500,
+        print_metrics: bool = False,
+        print_plots: bool = False,
+        epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
+        decay_rate: float = 0.05,
+    ) -> None:
         """
         Run a simulation from a set of bandits
         whose parameters are randomly generated
@@ -175,7 +181,7 @@ class OneParamGen(CLICommand):
             distribution=distribution,
             num_bandits=num_bandits,
             parameter_one_mean=parameter_one_mean,
-            parameter_one_std=parameter_one_std
+            parameter_one_std=parameter_one_std,
         )
         run_simulation(
             strategy=strategy,
@@ -193,18 +199,20 @@ class TwoParamGen(CLICommand):
 
     @staticmethod
     @app.command(command_name)
-    def cli_command(parameter_one_mean: float, #noqa
-                    parameter_one_std: float,
-                    parameter_two_mean: float,
-                    parameter_two_std: float,
-                    num_bandits: int = typer.Argument(min=2),
-                    strategy: Strategy = Strategy.epsilon_greedy,
-                    distribution: TwoParamDistribution = TwoParamDistribution.gaussian,
-                    num_simulations: Annotated[int, typer.Option(min=10)] = 500,
-                    print_metrics: bool = False,
-                    print_plots: bool = False,
-                    epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
-                    decay_rate: float = 0.05) -> None:
+    def cli_command(
+        parameter_one_mean: float,  # noqa
+        parameter_one_std: float,
+        parameter_two_mean: float,
+        parameter_two_std: float,
+        num_bandits: int = typer.Argument(min=2),
+        strategy: Strategy = Strategy.epsilon_greedy,
+        distribution: TwoParamDistribution = TwoParamDistribution.gaussian,
+        num_simulations: Annotated[int, typer.Option(min=10)] = 500,
+        print_metrics: bool = False,
+        print_plots: bool = False,
+        epsilon: Annotated[float, typer.Option(min=0, max=1)] = 0.2,
+        decay_rate: float = 0.05,
+    ) -> None:
         """
         Run a simulation from a set of bandits
         whose parameters are randomly generated
@@ -230,10 +238,7 @@ class TwoParamGen(CLICommand):
 
 
 @app.command()
-def simulate_from_json(
-    command: CLICommands,
-    config: str
-    ) -> None:
+def simulate_from_json(command: CLICommands, config: str) -> None:
     """
     Runs a multi-armed bandit simulation with
     configuration (arguments) provided via a json
@@ -253,10 +258,12 @@ def simulate_from_json(
 
 @app.command()
 def list_distributions() -> list[str]:
-    print("One Parameter Distributions: \n"  #noqa
-          f"{OneParamDistribution.values()} \n \n"
-          "Two Parameter Distributions: \n"
-          f"{TwoParamDistribution.values()}")
+    print(
+        "One Parameter Distributions: \n"  # noqa
+        f"{OneParamDistribution.values()} \n \n"
+        "Two Parameter Distributions: \n"
+        f"{TwoParamDistribution.values()}"
+    )
 
 
 if __name__ == "__main__":

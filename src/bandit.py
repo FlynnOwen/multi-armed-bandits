@@ -6,12 +6,8 @@ from functools import total_ordering
 from itertools import count
 from math import inf, sqrt
 from random import choice
-from typing import NewType
-from numpy.random import (
-    binomial,
-    normal,
-    poisson
-)
+
+from numpy.random import binomial, normal, poisson
 
 from src.utils.utils import ExtStrEnum
 
@@ -25,7 +21,9 @@ class TwoParamDistribution(ExtStrEnum):
     gaussian = "gaussian"
 
 
-def distribution_factory(distribution: OneParamDistribution | TwoParamDistribution) -> Bandit:  # noqa: ANN003
+def distribution_factory(
+    distribution: OneParamDistribution | TwoParamDistribution,
+) -> Bandit:  # noqa: ANN003
     distribution_map = {
         OneParamDistribution.bernoulli: BernoulliBandit,
         OneParamDistribution.poisson: PoissonBandit,
@@ -217,13 +215,9 @@ class PoissonBandit(Bandit):
 
     def validate_parameter(self, parameter: float) -> None:
         if parameter < 0:
-            raise ValueError(
-                f"parameter must be >= 0 got value {parameter} instead."
-            )
+            raise ValueError(f"parameter must be >= 0 got value {parameter} instead.")
         if not isinstance(parameter, int):
-            raise ValueError(
-                f"parameter must be of type integer."
-            )
+            raise ValueError(f"parameter must be of type integer.")
 
     def __init__(self, parameter: float) -> None:
         self.validate_parameter(parameter)
@@ -247,6 +241,7 @@ class PoissonBandit(Bandit):
         if not self._results:
             return inf
         return sum(self._results) / len(self._results)
+
 
 @dataclass
 class BanditCollection:
