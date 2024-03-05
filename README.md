@@ -10,6 +10,7 @@ In its basic form, a player repeatedly chooses from a set of arms, each with an 
 Methods Overview
 </h2>
 
+Given a collection of bandits, $`\sqrt{2}`$
 
 <h2  align="center">
 Usage
