@@ -72,8 +72,8 @@ just simulate-from-json {{COMMAND}} {{CONFIG}}
 Sample Outputs
 </h4>
 
-<p align="center">
 <p align="center"> Metrics from the simulations are output to stdout. </p>
+<p align="center">
 <img width="400" height="150" src="img/sim_metrics.png"/>
 </p>
 
