@@ -68,9 +68,9 @@ just simulate-from-json {{COMMAND}} {{CONFIG}}
 ```
 </p>
 
-<h4 align="center">
+<h2 align="center">
 Sample Outputs
-</h4>
+</h2>
 
 <p align="center"> Metrics from the simulations are output to stdout. </p>
 <p align="center">
