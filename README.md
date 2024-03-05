@@ -18,7 +18,7 @@ We therefore wish to find the `optimal bandit` to exploit; or in other words the
 
 There is a second constraint however, that is doing this using the fewest generations (bandit pulls) as possible. Reasons for this include being able to maximize cumulative reward, given a fixed number of generations (e.g if there is a time constraint), or generating may have another associated cost (e.g paying for each armed bandit pull).
 
-The problem can therefore be encapsulated as: Given a fixed number of generations, $`g`$; $`(1,..., g, ..., G)`$, maximizing cumulative reward: $`\sum{x_g}`$. This can be done by a number of different strategies - and all include some relation to balancing *exploration* (trying to accurately estimate each parameter $`\{\hat{\theta}_1, ..., \hat{\theta}_n \}`$), with *exploration* (the cumulative reward gained by just generating from the optimal bandit $`\tilde{\theta}`$).
+The problem can therefore be encapsulated as: Given a fixed number of generations, $`g`$; $`\{1,..., g, ..., G}`$, maximizing cumulative reward: $`\sum{x_g}`$. This can be done by a number of different strategies - and all include some relation to balancing *exploration* (trying to accurately estimate each parameter $`\{\hat{\theta}_1, ..., \hat{\theta}_n \}`$), with *exploration* (the cumulative reward gained by just generating from the optimal bandit $`\tilde{\theta}`$).
 
 <h2  align="center">
 Usage
