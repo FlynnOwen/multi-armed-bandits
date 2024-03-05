@@ -73,11 +73,12 @@ Sample Outputs
 </h4>
 
 <p align="center">
+<p align="center"> Metrics from the simulations are output to stdout. </p>
 <img width="400" height="150" src="img/sim_metrics.png"/>
-<p align="center"> Metrics from the simulations </p>
 </p>
 
 <p align="center">
+<p align="center"> Plots are also optionally produced, detailing the the performance of the simulation. </p>
 <img width="400" height="300" src="img/sim_cum_reward.png"/>
 <img width="400" height="300" src="img/sim_pulls.png"/>
 </p>
