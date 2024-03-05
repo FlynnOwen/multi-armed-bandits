@@ -15,6 +15,10 @@ Methods Overview
 Usage
 </h2>
 
+<h3  align="center">
+Running Simulations
+</h3>
+
 Options exist for simulating both directly using the command line, or via passing a configuration file in the form of JSON. The second is recommended for reproducable simulation studies.
 
 To see all possible simulation commands run
@@ -67,6 +71,16 @@ To perform this simulation, run:
 just simulate-from-json {{COMMAND}} {{CONFIG}}
 ```
 </p>
+
+<h3  align="center">
+Testing
+</h3>
+
+To run all unit and integration tests in the repository, execute:
+
+```bash
+just local-test
+```
 
 <h2 align="center">
 Sample Outputs
