@@ -2,14 +2,6 @@
 Multi Armed Bandits (MAB).
 </h1>
 
-The multi-armed bandit problem is a classic dilemma in probability theory and decision-making, often used to model situations where one must balance exploration (trying new options) and exploitation (leveraging known options). The name "multi-armed bandit" originates from the analogy of a gambler facing multiple slot machines (bandits), each with potentially different payoff probabilities. The objective is to maximize cumulative reward over time while facing uncertainty about which action (or bandit arm) yields the highest reward.
-
-In its basic form, a player repeatedly chooses from a set of arms, each with an unknown reward distribution, and receives a stochastic reward associated with the chosen arm. The challenge lies in deciding which arm to pull at each step to maximize cumulative reward, taking into account the trade-off between exploring new arms to gather information and exploiting arms with potentially higher expected rewards based on current knowledge.
-
-<h2  align="center">
-Methods Overview
-</h2>
-
 A study consistes of a collection of bandits, $`B = \{b_1, ..., b_n\}`$, where a bandit, $`b_i`$ has an associated parameter (or two parameters) that are within the exponential family of distributions. Thus, we have a collection $\theta = \{\theta_1, ..., \theta_n\}`$ of parameters (for the sake of two parameter distribution (e.g Gaussian), we refer to the primary parameter (\mu) as this single parameter).
 
 When 'pulling' a bandit, we are generating a random variable from this bandit's distribution. For example, if generating a random variable from bandit $`i`$ that follows a Poisson distribution, we denote this $`X_i \thicksim Pois(\theta_i)`$. 'Payout' or 'reward' is what we call this generated random variable, $`x_i`$, and it what we wish to maximize. In the case of gambling machines, it could be a 'win' (Bernoulli), or some form of `monetary payout` (Gaussian).
