@@ -238,8 +238,7 @@ class TwoParamGen(CLICommand):
 
 
 @app.command()
-def simulate_from_json(command: CLICommands,
-                       config: str) -> None:
+def simulate_from_json(command: CLICommands, config: str) -> None:
     """
     Runs a multi-armed bandit simulation with
     configuration (arguments) provided via a json
