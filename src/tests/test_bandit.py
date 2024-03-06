@@ -249,3 +249,17 @@ def test_distribution_factory(distribution, expected_bandit):
     bandit = distribution_factory(distribution=distribution)
 
     assert bandit == expected_bandit
+
+
+def test_from_parameter_distribution(distribution, expected_bandit):
+    """
+    TODO: Implement
+    """
+    pass
+
+
+def test_from_parameter_list(distribution, expected_bandit):
+    """
+    TODO: Implement
+    """
+    pass
