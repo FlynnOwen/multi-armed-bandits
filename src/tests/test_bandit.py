@@ -5,6 +5,7 @@ import pytest
 
 from src.bandit import (
     BanditCollection,
+    TwoParameterBanditCollection,
     BernoulliBandit,
     GaussianBandit,
     OneParamDistribution,
@@ -251,15 +252,25 @@ def test_distribution_factory(distribution, expected_bandit):
     assert bandit == expected_bandit
 
 
-def test_from_parameter_distribution(distribution, expected_bandit):
-    """
-    TODO: Implement
-    """
-    pass
+def test_from_parameter_distribution():
+    num_bandits = 10
+    bandit_collection = (BanditCollection
+                         .from_parameter_distribution(distribution=OneParamDistribution.bernoulli,
+                                                      num_bandits=num_bandits,
+                                                      parameter_one_mean=0.5,
+                                                      parameter_one_std=0.01))
 
+    assert len(bandit_collection.bandits) == num_bandits
+    assert bandit_collection.simulation_num == 0
+    assert all(sim == 0 for sim in bandit_collection.simulation_counts)
 
-def test_from_parameter_list(distribution, expected_bandit):
-    """
-    TODO: Implement
-    """
-    pass
+def test_from_parameter_list():
+    num_bandits = 10
+    parameter_one_values = [0.25 for _ in range(num_bandits)]
+    bandit_collection = (BanditCollection
+                         .from_parameter_list(distribution=OneParamDistribution.bernoulli,
+                                              parameter_one_values=parameter_one_values))
+
+    assert len(bandit_collection.bandits) == num_bandits
+    assert bandit_collection.simulation_num == 0
+    assert all(sim == 0 for sim in bandit_collection.simulation_counts)
