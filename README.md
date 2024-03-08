@@ -17,6 +17,12 @@ Usage
 </h2>
 
 <h3  align="center">
+Pre-requisites
+</h3>
+
+To run the below commands, it's suggested that [Just](https://github.com/casey/just) is installed.
+
+<h3  align="center">
 Running Simulations
 </h3>
 
