@@ -2,7 +2,7 @@
 Multi Armed Bandits (MAB).
 </h1>
 
-A study consistes of a collection of *bandits*, $`B = \{b_1, ..., b_n\}`$, where a *bandit*, $`b_i`$ has an associated parameter (or two parameters) that are within the exponential family of distributions. Thus, we have a collection $\theta = \{\theta_1, ..., \theta_n\}`$ of parameters (for the sake of two parameter distribution (e.g Gaussian), we refer to the primary parameter (\mu) as this single parameter).
+A study consists of a collection of *bandits*, $`B = \{b_1, ..., b_n\}`$, where a *bandit*, $`b_i`$ has an associated parameter (or two parameters) that are within the exponential family of distributions. Thus, we have a collection $\theta = \{\theta_1, ..., \theta_n\}`$ of parameters (for the sake of two parameter distribution (e.g Gaussian), we refer to the primary parameter (\mu) as this single parameter).
 
 When 'pulling' a bandit, we are generating a random variable from this bandit's distribution. For example, if generating a random variable from bandit $`i`$ that follows a Poisson distribution, we denote this $`X_i \thicksim Pois(\theta_i)`$. 'Payout' or 'reward' is what we call this generated random variable, $`x_i`$, and it what we wish to maximize. In the case of gambling machines, it could be a 'win' (Bernoulli), or some form of 'monetary payout' (Gaussian).
 
