@@ -13,7 +13,7 @@ from src.bandit import (
     TwoParamDistribution,
     TwoParameterBanditCollection,
 )
-from src.simulation import Strategy, strategy_factory
+from src.simulation import SimStrategy, simulation_strategy_factory
 from src.utils.utils import ExtStrEnum
 
 app = typer.Typer()
@@ -36,7 +36,7 @@ class CLICommands(ExtStrEnum):
 
 
 def run_simulation(
-    strategy: Strategy,
+    strategy: SimStrategy,
     num_simulations: int,
     print_metrics: bool,
     print_plots: bool,
@@ -44,7 +44,7 @@ def run_simulation(
     decay_rate: float | None,
     bandit_collection: BanditCollection,
 ) -> None:
-    simulation = strategy_factory(
+    simulation = simulation_strategy_factory(
         strategy=strategy,
         bandit_collection=bandit_collection,
         num_simulations=num_simulations,
@@ -77,7 +77,7 @@ class OneParamFixed(CLICommand):
     @staticmethod
     @app.command(command_name)
     def cli_command(
-        strategy: Strategy = Strategy.epsilon_greedy,  # noqa
+        strategy: SimStrategy = SimStrategy.epsilon_greedy,  # noqa
         distribution: OneParamDistribution = OneParamDistribution.bernoulli,
         num_simulations: Annotated[int, typer.Option(min=10)] = 500,
         print_metrics: bool = False,
@@ -111,7 +111,7 @@ class TwoParamFixed(CLICommand):
     @staticmethod
     @app.command(command_name)
     def cli_command(
-        strategy: Strategy = Strategy.epsilon_greedy,  # noqa
+        strategy: SimStrategy = SimStrategy.epsilon_greedy,  # noqa
         distribution: TwoParamDistribution = TwoParamDistribution.gaussian,
         num_simulations: Annotated[int, typer.Option(min=10)] = 500,
         print_metrics: bool = False,
@@ -157,7 +157,7 @@ class OneParamGen(CLICommand):
         parameter_one_mean: float,  # noqa
         parameter_one_std: float,
         num_bandits: int = typer.Argument(min=2),
-        strategy: Strategy = Strategy.epsilon_greedy,
+        strategy: SimStrategy = SimStrategy.epsilon_greedy,
         distribution: OneParamDistribution = OneParamDistribution.bernoulli,
         num_simulations: Annotated[int, typer.Option(min=10)] = 500,
         print_metrics: bool = False,
@@ -205,7 +205,7 @@ class TwoParamGen(CLICommand):
         parameter_two_mean: float,
         parameter_two_std: float,
         num_bandits: int = typer.Argument(min=2),
-        strategy: Strategy = Strategy.epsilon_greedy,
+        strategy: SimStrategy = SimStrategy.epsilon_greedy,
         distribution: TwoParamDistribution = TwoParamDistribution.gaussian,
         num_simulations: Annotated[int, typer.Option(min=10)] = 500,
         print_metrics: bool = False,

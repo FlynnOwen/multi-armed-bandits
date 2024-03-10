@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from enum import StrEnum
 from random import uniform
 
@@ -11,33 +10,20 @@ from src.metrics import OneParameterMetrics, TwoParameterMetrics
 from src.utils.utils import ucb
 
 
-class Strategy(StrEnum):
+class SimStrategy(StrEnum):
     epsilon_first = "epsilon_first"
     epsilon_decreasing = "epsilon_decreasing"
     epsilon_greedy = "epsilon_greedy"
 
 
-def strategy_factory(strategy: Strategy, **kwargs) -> SemiUniformStrategy:  # noqa: ANN003
+def simulation_strategy_factory(strategy: SimStrategy, **kwargs) -> SemiUniformStrategy:  # noqa: ANN003
     strategy_map = {
-        Strategy.epsilon_first: EpsilonFirstStrategy,
-        Strategy.epsilon_decreasing: EpsilonDecreasingStrategy,
-        Strategy.epsilon_greedy: EpsilonGreedyStrategy,
+        SimStrategy.epsilon_first: EpsilonFirstStrategy,
+        SimStrategy.epsilon_decreasing: EpsilonDecreasingStrategy,
+        SimStrategy.epsilon_greedy: EpsilonGreedyStrategy,
     }
 
     return strategy_map[strategy](**kwargs)
-
-
-@dataclass
-class Simulation:
-    """
-    Base class for MAB simulations.
-    """
-
-    bandit_collection: BanditCollection
-    strategy: SemiUniformStrategy
-
-    def full_simulation(self) -> None:
-        self.strategy.full_simulation(self.bandit_collection)
 
 
 class SemiUniformStrategy(ABC):
@@ -53,8 +39,7 @@ class SemiUniformStrategy(ABC):
         self,
         bandit_collection: BanditCollection,
         num_simulations: int,
-        epsilon: float = 0.2,
-        **kwargs,
+        epsilon: float = 0.2
     ):
         if 0 > epsilon < 1:
             raise ValueError(
@@ -212,7 +197,7 @@ class EpsilonFirstStrategy(SemiUniformStrategy):
         self.bandit_collection.results.append(result)
 
 
-class UCBSimulation(Simulation):
+class UCBSimulation:
     """
     Simulation incorporating the Upper Confidence Bound (UCB).
 
