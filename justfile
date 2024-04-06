@@ -30,7 +30,7 @@ format:
     just lint
     ruff format .
 
-simulate-from-json COMMAND CONFIG: pyenv-activate
+simulate-from-json COMMAND CONFIG: install-requirements
     python3 -m src.main simulate-from-json {{COMMAND}} {{CONFIG}}
 
 # Usage

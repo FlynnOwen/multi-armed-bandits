@@ -49,7 +49,7 @@ def run_simulation(
         bandit_collection=bandit_collection,
         num_simulations=num_simulations,
         epsilon=epsilon,
-        decay_rate=decay_rate,  # HACK: This parameter should only be passed to some strategies. # noqa: E501
+        #decay_rate=decay_rate,  # HACK: This parameter should only be passed to some strategies. # noqa: E501
     )
 
     simulation.full_simulation()
